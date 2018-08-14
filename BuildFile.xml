@@ -1,0 +1,10 @@
+<use   name="FWCore/Utilities"/>
+<use   name="FWCore/Common"/>
+<use   name="DataFormats/Math"/>
+<use   name="DataFormats/PatCandidates"/>
+<use   name="PhysicsTools/CandUtils"/>
+<use   name="fastjet"/>
+<use   name="lwtnn"/>
+<export>
+  <lib   name="1"/>
+</export>
