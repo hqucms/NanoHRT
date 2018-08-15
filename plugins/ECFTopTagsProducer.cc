@@ -213,15 +213,15 @@ void ECFTopTagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     std::vector<PseudoJet> sdConstsFiltered(sdConstituents.begin(), sdConstituents.begin() + nFilter);
     ecfcalc->calculate(sdConstsFiltered);
     ecfs[0]  = get_ecf(1,2,2) / pow(get_ecf(1,2,1),2.00);
-    ecfs[1]  = get_ecf(1,3,4) / get_ecf(2,3,2);
-    ecfs[2]  = get_ecf(3,3,1) / pow(get_ecf(1,3,4),0.75);
+    ecfs[1]  = get_ecf(1,3,3) / get_ecf(2,3,2);
+    ecfs[2]  = get_ecf(3,3,1) / pow(get_ecf(1,3,3),0.75);
     ecfs[3]  = get_ecf(3,3,1) / pow(get_ecf(2,3,2),0.75);
-    ecfs[4]  = get_ecf(3,3,2) / pow(get_ecf(3,3,4),0.50);
+    ecfs[4]  = get_ecf(3,3,2) / pow(get_ecf(3,3,3),0.50);
     ecfs[5]  = get_ecf(1,4,2) / pow(get_ecf(1,3,1),2.00);
-    ecfs[6]  = get_ecf(1,4,4) / pow(get_ecf(1,3,2),2.00);
-    ecfs[7]  = get_ecf(2,4,0.5) / pow(get_ecf(1,3,0.5),2.00);
+    ecfs[6]  = get_ecf(1,4,3) / pow(get_ecf(1,3,2),2.00);
+    ecfs[7]  = get_ecf(2,4,1) / pow(get_ecf(1,3,1),2.00);
     ecfs[8]  = get_ecf(2,4,1) / pow(get_ecf(1,3,1),2.00);
-    ecfs[9]  = get_ecf(2,4,1) / pow(get_ecf(2,3,0.5),2.00);
+    ecfs[9]  = get_ecf(2,4,1) / pow(get_ecf(2,3,1),2.00);
     ecfs[10] = get_ecf(2,4,2) / pow(get_ecf(1,3,2),2.00);
 
     // compute HEPTopTag
