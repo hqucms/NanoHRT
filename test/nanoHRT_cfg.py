@@ -10,12 +10,13 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load('Configuration.StandardSequences.Services_cff')
 
 process.options = cms.untracked.PSet(wantSummary=cms.untracked.bool(True))
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(10))
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring())
 process.source.fileNames = [
-'/store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root',
+#'/store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root',
+'file:///tmp/snarayan/D6D620EF-73BE-E611-8BFB-B499BAA67780.root'
 ]
 
 process.load("PhysicsTools.NanoAOD.nano_cff")
