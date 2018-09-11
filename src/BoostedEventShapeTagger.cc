@@ -246,7 +246,7 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
         jetFJparticles_transformed.push_back( PseudoJet( thisParticleLV_transformed.X(), thisParticleLV_transformed.Y(), thisParticleLV_transformed.Z(), thisParticleLV_transformed.T() ) );
 
 
-	
+
 
 	thisParticleLV_jet *= puppiWt;
         thisParticleLV_top *= puppiWt;
@@ -549,8 +549,8 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["h3_top"] = fwm_top[3];
     m_BESTvars["h4_top"] = fwm_top[4];
     m_BESTvars["isotropy_top"]   = eventShapes_top.isotropy();
-    m_BESTvars["sphericity_top"] = eventShapes_top.sphericity(2);
-    m_BESTvars["aplanarity_top"] = eventShapes_top.aplanarity(2);
+    m_BESTvars["sphericity_top"] = eventShapes_top.sphericity();
+    m_BESTvars["aplanarity_top"] = eventShapes_top.aplanarity();
     m_BESTvars["thrust_top"]     = thrustCalculator_top.thrust();
 
     // -- W values
@@ -559,8 +559,8 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["h3_W"] = fwm_W[3];
     m_BESTvars["h4_W"] = fwm_W[4];
     m_BESTvars["isotropy_W"]   = eventShapes_W.isotropy();
-    m_BESTvars["sphericity_W"] = eventShapes_W.sphericity(2);
-    m_BESTvars["aplanarity_W"] = eventShapes_W.aplanarity(2);
+    m_BESTvars["sphericity_W"] = eventShapes_W.sphericity();
+    m_BESTvars["aplanarity_W"] = eventShapes_W.aplanarity();
     m_BESTvars["thrust_W"]     = thrustCalculator_W.thrust();
 
     // -- Z values
@@ -569,8 +569,8 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["h3_Z"] = fwm_Z[3];
     m_BESTvars["h4_Z"] = fwm_Z[4];
     m_BESTvars["isotropy_Z"]   = eventShapes_Z.isotropy();
-    m_BESTvars["sphericity_Z"] = eventShapes_Z.sphericity(2);
-    m_BESTvars["aplanarity_Z"] = eventShapes_Z.aplanarity(2);
+    m_BESTvars["sphericity_Z"] = eventShapes_Z.sphericity();
+    m_BESTvars["aplanarity_Z"] = eventShapes_Z.aplanarity();
     m_BESTvars["thrust_Z"]     = thrustCalculator_Z.thrust();
 
     // -- H values
@@ -579,11 +579,9 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["h3_H"] = fwm_H[3];
     m_BESTvars["h4_H"] = fwm_H[4];
     m_BESTvars["isotropy_H"]   = eventShapes_H.isotropy();
-    m_BESTvars["sphericity_H"] = eventShapes_H.sphericity(2);
-    m_BESTvars["aplanarity_H"] = eventShapes_H.aplanarity(2);
+    m_BESTvars["sphericity_H"] = eventShapes_H.sphericity();
+    m_BESTvars["aplanarity_H"] = eventShapes_H.aplanarity();
     m_BESTvars["thrust_H"]     = thrustCalculator_H.thrust();
-
-
 
     return;
 }
