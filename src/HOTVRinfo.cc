@@ -49,7 +49,7 @@ namespace contrib{
 }
 
 
-  double HOTVRinfo::ptfraction(int i) const { //calculate the pTfraction pT_{subjet,i}/pT_{jet}
+  double HOTVRinfo::ptfraction(unsigned i) const { //calculate the pTfraction pT_{subjet,i}/pT_{jet}
   double ptfraction=0;
   if(_subjets.size()>i)
     ptfraction=_subjets.at(i).perp()/_parent.perp();
@@ -59,7 +59,7 @@ namespace contrib{
   double HOTVRinfo::max_distance() const { //calculates the size of the jet, by finding the constituent with the largest distance. Can be used as an estimate for a jet radius
     std::vector<fastjet::PseudoJet> pfcands = _parent.constituents();
     double oldR=0;
-    for(int j=0;j<pfcands.size();j++){
+    for(unsigned j=0;j<pfcands.size();j++){
       double R;
       R=_parent.delta_R(pfcands[j]);
 	    if(R>oldR){

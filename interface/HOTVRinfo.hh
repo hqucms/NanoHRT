@@ -1,10 +1,10 @@
 //----------------------------------------------------------------------
-//  
+//
 //  The Heavy Object Tagger with Variable R (HOTVR)
-// 
+//
 //  Helper class to access subjets and calculate jet observables.
 //
-//  For questions and comments, please contact: 
+//  For questions and comments, please contact:
 //      Tobias Lapsien  <tobias.lapsien@desy.de>
 //      Roman Kogler    <roman.kogler@uni-hamburg.de>
 //      Johannes Haller <johannes.haller@uni-hamburg.de>
@@ -29,7 +29,7 @@
 #ifndef __FASTJET_CONTRIB_HOTVRINFO_HH__
 #define __FASTJET_CONTRIB_HOTVRINFO_HH__
 #include "fastjet/PseudoJet.hh"
-FASTJET_BEGIN_NAMESPACE  
+FASTJET_BEGIN_NAMESPACE
 
 namespace contrib{
 
@@ -38,9 +38,9 @@ namespace contrib{
 
     // inline constructor
     // construct the helper class with the subjets and the the parent jet itself
-    HOTVRinfo(fastjet::PseudoJet jet, std::vector<PseudoJet> subjets): _subjets(subjets), _parent(jet) {}; 
+    HOTVRinfo(fastjet::PseudoJet jet, std::vector<PseudoJet> subjets): _subjets(subjets), _parent(jet) {};
 
-    // size of the jet, defined by the constituent with the largest distance DeltaR from 
+    // size of the jet, defined by the constituent with the largest distance DeltaR from
     // the jet axis, can can be used as an estimate for a jet radius
     double max_distance() const;
 
@@ -54,13 +54,13 @@ namespace contrib{
     double mmin() const;
 
     // ptfraction of subjet i, given by p_T,i / p_T,fatjet
-    double ptfraction(int i) const;
-       
+    double ptfraction(unsigned i) const;
+
   private:
     std::vector<fastjet::PseudoJet> _subjets;
     fastjet::PseudoJet _parent;
   };
-  
+
 
 }
 FASTJET_END_NAMESPACE

@@ -83,7 +83,7 @@ namespace contrib {
      _clust_type(clust_type), _requested_strategy(requested_strategy)
   {
     if (!_already_printed){
-      print_banner();
+//      print_banner();
       _already_printed = true;
     }
 
@@ -107,6 +107,14 @@ namespace contrib {
 
   void HOTVR::run_clustering(ClusterSequence & cs) const {
 
+    // set up NNH
+    HOTVRNNInfo nninfo(_rho2, _min_r2, _max_r2, _clust_type);
+
+    // the following code has been written by G. Soyez and is taken from
+    // VariableR/VariableRPlugin.cc, version 1.2.1
+    // -> make use of the NN-type clustering in FastJet 3.2 and higher
+#if FASTJET_VERSION_NUMBER >= 30200
+
     // set up clustering strategy
     Strategy strategy = _requested_strategy;
 
@@ -115,13 +123,6 @@ namespace contrib {
       strategy = best_strategy(cs.jets().size());
     }
 
-    // set up NNH
-    HOTVRNNInfo nninfo(_rho2, _min_r2, _max_r2, _clust_type);
-
-    // the following code has been written by G. Soyez and is taken from
-    // VariableR/VariableRPlugin.cc, version 1.2.1
-    // -> make use of the NN-type clustering in FastJet 3.2 and higher
-#if FASTJET_VERSION_NUMBER >= 30200
     if (strategy==N2Tiled){
       NNFJN2Tiled<HOTVRBriefJet,HOTVRNNInfo> nnt(cs.jets(), _max_r, &nninfo);
       NN_clustering(cs, nnt);
@@ -159,7 +160,7 @@ namespace contrib {
 
 	      bool set=false;
 	      std::vector<fastjet::PseudoJet> subjets;
-	      for(int o=0;o<_jets.size();o++){
+	      for(unsigned o=0;o<_jets.size();o++){
 	        if(_jets[o].user_index()==i) {
 	          _jets[_jets.size()-1].set_user_index(i*100);
 	          if(!set) {
@@ -214,7 +215,7 @@ namespace contrib {
 	      if(cs.jets()[i].pt()>=_pt_sub && cs.jets()[j].pt()>=_pt_sub) {//check if the subjet pT is higher than the threshold
 	        cs.plugin_record_ij_recombination(i, j, dij, k);
 
-  	      for(int o=0;o<_jets.size();o++){
+  	      for(unsigned o=0;o<_jets.size();o++){
 	          if(_jets[o].user_index()==j) {
 	            _jets[o].set_user_index(k);
 	            existing_j=true;
