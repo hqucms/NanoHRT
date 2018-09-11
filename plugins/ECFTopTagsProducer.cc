@@ -182,10 +182,9 @@ void ECFTopTagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     // convert the jet into pseudojet
     std::vector<PseudoJet> vjet;
     for (const auto &cand : jet.daughterPtrVector()) {
-      const auto* pack_cand = dynamic_cast<const pat::PackedCandidate*>(&(*cand));
-      auto puppiP4 = cand->p4();
-      if (puppiP4.pt() < 0.01) continue;
-      vjet.emplace_back(puppiP4.px(), puppiP4.py(), puppiP4.pz(), puppiP4.energy());
+      // candidate's momentum is already scaled by Puppi
+      if (cand->pt() < 0.01) continue;
+      vjet.emplace_back(cand->px(), cand->py(), cand->pz(), cand->energy());
     }
 
     ClusterSequenceArea seq(vjet, *jetDef, *areaDef);
@@ -239,7 +238,7 @@ void ECFTopTagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     newJet.addUserFloat("httMass", htt_mass);
     newJet.addUserFloat("httFRec", htt_frec);
     newJet.addUserFloat("tau32sd", tau32sd);
-    bool sane = get_ecf(2, 4, 2) > 0; // sanity check - if anything hits 0 or below, this will  
+    bool sane = get_ecf(2, 4, 2) > 0; // sanity check - if anything hits 0 or below, this will
     newJet.addUserFloat("ecfTopTagBDT", sane ? bdt->EvaluateMVA(bdt_name_): -1.2);
     outputs->push_back(newJet);
   }
