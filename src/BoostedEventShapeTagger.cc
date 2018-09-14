@@ -28,6 +28,7 @@ Requires MiniAOD inputs to access proper set of information
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "PhysicsTools/CandUtils/interface/EventShapeVariables.h"
 #include "PhysicsTools/CandUtils/interface/Thrust.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 
 // FASTJET
 #include <fastjet/JetDefinition.hh>
@@ -46,7 +47,7 @@ BoostedEventShapeTagger::BoostedEventShapeTagger(const std::string& configFile, 
   m_radiusLarge(0),
   m_reclusterJetPtMin(0),
   m_jetChargeKappa(0),
-  m_maxJetSize(0){
+  m_maxJetSize(4){
     // Configuration
     std::vector<std::string> configurations;
     read_file(configFile,configurations);
@@ -68,6 +69,7 @@ BoostedEventShapeTagger::BoostedEventShapeTagger(const std::string& configFile, 
 
     // DNN material lwtnn interface
 //    std::string dnnFile = m_configurations.at("dnnFile");
+     std::cout << "Using dnn file " << dnnFile << std::endl;
     std::ifstream input_cfg( dnnFile );                     // original: "data/BEST_mlp.json"
     lwt::JSONConfig cfg = lwt::parse_json( input_cfg );
     m_lwtnn = std::make_unique<lwt::LightweightNeuralNetwork>(cfg.inputs, cfg.layers, cfg.outputs);
@@ -87,6 +89,7 @@ const std::map<std::string,double>& BoostedEventShapeTagger::execute( const pat:
       m_NNresults["dnn_higgs"] = 0;
       m_NNresults["dnn_z"] = 0;
       m_NNresults["dnn_w"] = 0;
+      m_NNresults["dnn_b"] = 0;
     }else{
       m_NNresults = m_lwtnn->compute(m_BESTvars);
     }
@@ -199,27 +202,28 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     auto daus(jet.daughterPtrVector());             // load the daughters
     auto daughter0 = jet.daughter(0); //daus.at(0); // First soft drop constituent
     auto daughter1 = jet.daughter(1); //daus.at(1); // Second soft drop constituent
-    std::vector<reco::Candidate*> daughtersOfJet;   // store all daughters in one vector
+    std::vector<pat::PackedCandidate*> daughtersOfJet;   // store all daughters in one vector
 
     // access daughters of the first soft drop constituent
-    for (unsigned int i=0,size=daughter0->numberOfDaughters(); i<size; i++){
-        daughtersOfJet.push_back( (reco::Candidate *) daughter0->daughter(i) );
-    }
+    //for (unsigned int i=0,size=daughter0->numberOfDaughters(); i<size; i++){
+    //    daughtersOfJet.push_back( (pat::PackedCandidate *) daughter0->daughter(i) );
+   // }
     // access daughters of the second soft drop constituent
-    for (unsigned int i=0,size=daughter1->numberOfDaughters(); i<size; i++){
-        daughtersOfJet.push_back( (reco::Candidate *) daughter1->daughter(i));
-    }
+   // for (unsigned int i=0,size=daughter1->numberOfDaughters(); i<size; i++){
+   //     daughtersOfJet.push_back( (pat::PackedCandidate *) daughter1->daughter(i));
+   // }
 
     // access remaining daughters not retained by in soft drop
-    for (unsigned int i=2,size=jet.numberOfDaughters()/*daus.size()*/; i<size; i++){
-        daughtersOfJet.push_back( (reco::Candidate*)jet.daughter(i) ); //(reco::Candidate)daus.at(i) );
+    for (unsigned int i=0,size=jet.numberOfDaughters()/*daus.size()*/; i<size; i++){
+        daughtersOfJet.push_back( (pat::PackedCandidate*)jet.daughter(i) ); //(pat::PackedCandidate)daus.at(i) );
     }
 
     for(unsigned int i=0,size=daughtersOfJet.size(); i<size; i++){
 
         auto daughter = daughtersOfJet.at(i);
 
-        if (daughter->pt() < 0.5) continue;
+        float puppiWt = daughter->puppiWeight();
+        if (puppiWt*daughter->pt() < 0.5) continue;
 
         float dau_px = daughter->px();
         float dau_py = daughter->py();
@@ -232,8 +236,6 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
         TLorentzVector thisParticleLV_Z(   dau_px,dau_py,dau_pz,dau_e );
         TLorentzVector thisParticleLV_H(   dau_px,dau_py,dau_pz,dau_e );
 
-        if (daughter->pt() > 1.0)
-            qxptsum += daughter->charge() * pow( daughter->pt(), m_jetChargeKappa);
 
 
         topFJparticles_noBoost.push_back( PseudoJet( thisParticleLV_top.X(), thisParticleLV_top.Y(), thisParticleLV_top.Z(), thisParticleLV_top.T() ) );
@@ -242,6 +244,18 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
         TLorentzVector thisParticleLV_transformed( transformedV.X(), transformedV.Y(), transformedV.Z(), thisParticleLV_jet.E() );
 
         jetFJparticles_transformed.push_back( PseudoJet( thisParticleLV_transformed.X(), thisParticleLV_transformed.Y(), thisParticleLV_transformed.Z(), thisParticleLV_transformed.T() ) );
+
+
+	
+
+	thisParticleLV_jet *= puppiWt;
+        thisParticleLV_top *= puppiWt;
+        thisParticleLV_W *= puppiWt;
+        thisParticleLV_Z *= puppiWt;
+        thisParticleLV_H *= puppiWt;
+        if (daughter->pt() > 1.0)
+            qxptsum += daughter->charge() * pow( daughter->pt(), m_jetChargeKappa);
+
 
         thisParticleLV_jet.Boost( -thisJetLV.BoostVector() );
         thisParticleLV_Z.Boost(   -thisJetLV_Z.BoostVector() );
@@ -482,7 +496,7 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["et"]      = thisJet.Pt();
     m_BESTvars["eta"]     = thisJet.Rapidity();
     m_BESTvars["mass"]    = thisJet.M();
-    m_BESTvars["SDmass"]  = jet.userFloat("ak8PFJetsPuppiSoftDropMass");
+    m_BESTvars["SDmass"]  = jet.mass();
     m_BESTvars["tau32"]   = (tau2 > 1e-8) ? tau3/tau2 : 999.;
     m_BESTvars["tau21"]   = (tau1 > 1e-8) ? tau2/tau1 : 999.;
     m_BESTvars["q"]       = jetq;
@@ -492,25 +506,25 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["m23_jet"]   = m23LV_jet.M();
     m_BESTvars["m13_jet"]   = m13LV_jet.M();
 
-    m_BESTvars["m1234top"] = m1234LV_top.M();
-    m_BESTvars["m12top"]   = m12LV_top.M();
-    m_BESTvars["m23top"]   = m23LV_top.M();
-    m_BESTvars["m13top"]   = m13LV_top.M();
+    m_BESTvars["m1234_top"] = m1234LV_top.M();
+    m_BESTvars["m12_top"]   = m12LV_top.M();
+    m_BESTvars["m23_top"]   = m23LV_top.M();
+    m_BESTvars["m13_top"]   = m13LV_top.M();
 
-    m_BESTvars["m1234W"] = m1234LV_W.M();
-    m_BESTvars["m12W"]   = m12LV_W.M();
-    m_BESTvars["m23W"]   = m23LV_W.M();
-    m_BESTvars["m13W"]   = m13LV_W.M();
+    m_BESTvars["m1234_W"] = m1234LV_W.M();
+    m_BESTvars["m12_W"]   = m12LV_W.M();
+    m_BESTvars["m23_W"]   = m23LV_W.M();
+    m_BESTvars["m13_W"]   = m13LV_W.M();
 
-    m_BESTvars["m1234Z"] = m1234LV_Z.M();
-    m_BESTvars["m12Z"]   = m12LV_Z.M();
-    m_BESTvars["m23Z"]   = m23LV_Z.M();
-    m_BESTvars["m13Z"]   = m13LV_Z.M();
+    m_BESTvars["m1234_Z"] = m1234LV_Z.M();
+    m_BESTvars["m12_Z"]   = m12LV_Z.M();
+    m_BESTvars["m23_Z"]   = m23LV_Z.M();
+    m_BESTvars["m13_Z"]   = m13LV_Z.M();
 
-    m_BESTvars["m1234H"] = m1234LV_H.M();
-    m_BESTvars["m12H"]   = m12LV_H.M();
-    m_BESTvars["m23H"]   = m23LV_H.M();
-    m_BESTvars["m13H"]   = m13LV_H.M();
+    m_BESTvars["m1234_H"] = m1234LV_H.M();
+    m_BESTvars["m12_H"]   = m12LV_H.M();
+    m_BESTvars["m23_H"]   = m23LV_H.M();
+    m_BESTvars["m13_H"]   = m13LV_H.M();
 
     std::vector<std::string> jetNames = {"top","W","Z","H","jet"};
 
@@ -530,44 +544,46 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["Njets_orig"] = jetsFJ_noBoost.size();
 
     // -- top values
-    m_BESTvars["FWmoment1top"] = fwm_top[1];
-    m_BESTvars["FWmoment2top"] = fwm_top[2];
-    m_BESTvars["FWmoment3top"] = fwm_top[3];
-    m_BESTvars["FWmoment4top"] = fwm_top[4];
-    m_BESTvars["isotropytop"]   = eventShapes_top.isotropy();
-    m_BESTvars["sphericitytop"] = eventShapes_top.sphericity(2);
-    m_BESTvars["aplanaritytop"] = eventShapes_top.aplanarity(2);
-    m_BESTvars["thrusttop"]     = thrustCalculator_top.thrust();
+    m_BESTvars["h1_top"] = fwm_top[1];
+    m_BESTvars["h2_top"] = fwm_top[2];
+    m_BESTvars["h3_top"] = fwm_top[3];
+    m_BESTvars["h4_top"] = fwm_top[4];
+    m_BESTvars["isotropy_top"]   = eventShapes_top.isotropy();
+    m_BESTvars["sphericity_top"] = eventShapes_top.sphericity(2);
+    m_BESTvars["aplanarity_top"] = eventShapes_top.aplanarity(2);
+    m_BESTvars["thrust_top"]     = thrustCalculator_top.thrust();
 
     // -- W values
-    m_BESTvars["FWmoment1W"] = fwm_W[1];
-    m_BESTvars["FWmoment2W"] = fwm_W[2];
-    m_BESTvars["FWmoment3W"] = fwm_W[3];
-    m_BESTvars["FWmoment4W"] = fwm_W[4];
-    m_BESTvars["isotropyW"]   = eventShapes_W.isotropy();
-    m_BESTvars["sphericityW"] = eventShapes_W.sphericity(2);
-    m_BESTvars["aplanarityW"] = eventShapes_W.aplanarity(2);
-    m_BESTvars["thrustW"]     = thrustCalculator_W.thrust();
+    m_BESTvars["h1_W"] = fwm_W[1];
+    m_BESTvars["h2_W"] = fwm_W[2];
+    m_BESTvars["h3_W"] = fwm_W[3];
+    m_BESTvars["h4_W"] = fwm_W[4];
+    m_BESTvars["isotropy_W"]   = eventShapes_W.isotropy();
+    m_BESTvars["sphericity_W"] = eventShapes_W.sphericity(2);
+    m_BESTvars["aplanarity_W"] = eventShapes_W.aplanarity(2);
+    m_BESTvars["thrust_W"]     = thrustCalculator_W.thrust();
 
     // -- Z values
-    m_BESTvars["FWmoment1Z"] = fwm_Z[1];
-    m_BESTvars["FWmoment2Z"] = fwm_Z[2];
-    m_BESTvars["FWmoment3Z"] = fwm_Z[3];
-    m_BESTvars["FWmoment4Z"] = fwm_Z[4];
-    m_BESTvars["isotropyZ"]   = eventShapes_Z.isotropy();
-    m_BESTvars["sphericityZ"] = eventShapes_Z.sphericity(2);
-    m_BESTvars["aplanarityZ"] = eventShapes_Z.aplanarity(2);
-    m_BESTvars["thrustZ"]     = thrustCalculator_Z.thrust();
+    m_BESTvars["h1_Z"] = fwm_Z[1];
+    m_BESTvars["h2_Z"] = fwm_Z[2];
+    m_BESTvars["h3_Z"] = fwm_Z[3];
+    m_BESTvars["h4_Z"] = fwm_Z[4];
+    m_BESTvars["isotropy_Z"]   = eventShapes_Z.isotropy();
+    m_BESTvars["sphericity_Z"] = eventShapes_Z.sphericity(2);
+    m_BESTvars["aplanarity_Z"] = eventShapes_Z.aplanarity(2);
+    m_BESTvars["thrust_Z"]     = thrustCalculator_Z.thrust();
 
     // -- H values
-    m_BESTvars["FWmoment1H"] = fwm_H[1];
-    m_BESTvars["FWmoment2H"] = fwm_H[2];
-    m_BESTvars["FWmoment3H"] = fwm_H[3];
-    m_BESTvars["FWmoment4H"] = fwm_H[4];
-    m_BESTvars["isotropyH"]   = eventShapes_H.isotropy();
-    m_BESTvars["sphericityH"] = eventShapes_H.sphericity(2);
-    m_BESTvars["aplanarityH"] = eventShapes_H.aplanarity(2);
-    m_BESTvars["thrustH"]     = thrustCalculator_H.thrust();
+    m_BESTvars["h1_H"] = fwm_H[1];
+    m_BESTvars["h2_H"] = fwm_H[2];
+    m_BESTvars["h3_H"] = fwm_H[3];
+    m_BESTvars["h4_H"] = fwm_H[4];
+    m_BESTvars["isotropy_H"]   = eventShapes_H.isotropy();
+    m_BESTvars["sphericity_H"] = eventShapes_H.sphericity(2);
+    m_BESTvars["aplanarity_H"] = eventShapes_H.aplanarity(2);
+    m_BESTvars["thrust_H"]     = thrustCalculator_H.thrust();
+
+
 
     return;
 }
@@ -675,7 +691,7 @@ unsigned int BoostedEventShapeTagger::getParticleID(){
         e.g., define working points to "tag" a jet.
     */
     std::vector<double> values{ m_NNresults["dnn_qcd"],   m_NNresults["dnn_top"],
-                                m_NNresults["dnn_higgs"], m_NNresults["dnn_z"], m_NNresults["dnn_w"] };
+                                m_NNresults["dnn_higgs"], m_NNresults["dnn_z"], m_NNresults["dnn_w"], m_NNresults["dnn_b"] };
 
     unsigned int particleID(0);
     double max_value(-1.0);
