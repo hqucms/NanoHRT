@@ -72,7 +72,7 @@ class BoostedEventShapeTagger {
     float m_Tmass = 172.5;      // Top mass
 
     std::map<std::string,std::string> m_defaultConfigs = {
-             {"dnnFile",             "BESTAnalysis/BoostedEventShapeTagger/data/BEST_mlp.json"},
+             {"dnnFile",             "BESTAnalysis/BoostedEventShapeTagger/data/BEST_6bin_PUPPI.json"},
              {"radiusSmall",         "0.4"},
              {"radiusLarge",         "0.8"},
              {"reclusterJetPtMin",   "30.0"},
