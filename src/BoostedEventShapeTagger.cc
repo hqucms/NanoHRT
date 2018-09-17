@@ -199,28 +199,15 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     float ptsum = pow(jet.pt(), m_jetChargeKappa);  // weighted jet pT
 
     // loop over daughters
-    auto daus(jet.daughterPtrVector());             // load the daughters
-    auto daughter0 = jet.daughter(0); //daus.at(0); // First soft drop constituent
-    auto daughter1 = jet.daughter(1); //daus.at(1); // Second soft drop constituent
-    std::vector<pat::PackedCandidate*> daughtersOfJet;   // store all daughters in one vector
+    std::vector<const pat::PackedCandidate*> daughtersOfJet;   // store all daughters in one vector
 
-    // access daughters of the first soft drop constituent
-    //for (unsigned int i=0,size=daughter0->numberOfDaughters(); i<size; i++){
-    //    daughtersOfJet.push_back( (pat::PackedCandidate *) daughter0->daughter(i) );
-   // }
-    // access daughters of the second soft drop constituent
-   // for (unsigned int i=0,size=daughter1->numberOfDaughters(); i<size; i++){
-   //     daughtersOfJet.push_back( (pat::PackedCandidate *) daughter1->daughter(i));
-   // }
-
-    // access remaining daughters not retained by in soft drop
-    for (unsigned int i=0,size=jet.numberOfDaughters()/*daus.size()*/; i<size; i++){
-        daughtersOfJet.push_back( (pat::PackedCandidate*)jet.daughter(i) ); //(pat::PackedCandidate)daus.at(i) );
+    for (unsigned int i=0,size=jet.numberOfDaughters(); i<size; i++){
+        daughtersOfJet.push_back( dynamic_cast<const pat::PackedCandidate*>(jet.daughter(i)) );
     }
 
     for(unsigned int i=0,size=daughtersOfJet.size(); i<size; i++){
 
-        auto daughter = daughtersOfJet.at(i);
+        const auto* daughter = daughtersOfJet.at(i);
 
         float puppiWt = daughter->puppiWeight();
         if (puppiWt*daughter->pt() < 0.5) continue;
@@ -248,7 +235,7 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
 
 
 
-	thisParticleLV_jet *= puppiWt;
+        thisParticleLV_jet *= puppiWt;
         thisParticleLV_top *= puppiWt;
         thisParticleLV_W *= puppiWt;
         thisParticleLV_Z *= puppiWt;
