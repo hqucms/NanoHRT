@@ -40,6 +40,7 @@ def createConfig(args, dataset):
 
     config.JobType.pluginName = 'Analysis'
     config.JobType.psetName = args.pset
+    config.JobType.sendExternalFolder = args.send_external
     config.JobType.numCores = args.num_cores
     config.JobType.maxMemoryMB = args.max_memory
 
@@ -75,7 +76,7 @@ def main():
                         help='Job splitting method. Default: %(default)s'
                         )
     parser.add_argument('-n', '--units-per-job',
-                        default=480,
+                        default=480, type=int,
                         help='Units per job. The meaning depends on the splitting. Default: %(default)d'
                         )
     parser.add_argument('-t', '--tag',
@@ -86,6 +87,10 @@ def main():
                         default='T3_US_FNALLPC',
                         help='Storage site. Default: %(default)s'
                         )
+    parser.add_argument('--send-external',
+                        action='store_true', default=False,
+                        help='Send external folder. Default: %(default)s'
+                        )
     parser.add_argument('--no-publication',
                         action='store_true', default=False,
                         help='Do not publish the output dataset. Default: %(default)s'
@@ -95,11 +100,11 @@ def main():
                         help='Crab project area. Default: %(default)s'
                         )
     parser.add_argument('--num-cores',
-                        default=1,
+                        default=1, type=int,
                         help='Number of CPU cores. Default: %(default)d'
                         )
     parser.add_argument('--max-memory',
-                        default=2500,
+                        default=2500, type=int,
                         help='Number of memory. Default: %(default)d MB'
                         )
     parser.add_argument('--dryrun',
