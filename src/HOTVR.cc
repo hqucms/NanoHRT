@@ -45,10 +45,10 @@
 #include <sstream>
 #include <memory>
 
-#include <fastjet/NNH.hh>
-#if FASTJET_VERSION_NUMBER >= 30200
-#include <fastjet/NNFJN2Plain.hh>
-#include <fastjet/NNFJN2Tiled.hh>
+#include "../interface/NNH.hh"
+#if FASTJET_VERSION_NUMBER >= 30100
+#include "../interface/NNFJN2Plain.hh"
+#include "../interface/NNFJN2Tiled.hh"
 #endif
 
 
@@ -97,7 +97,7 @@ namespace contrib {
     if (pt_sub<0)  throw Error("HOTVR: pT threshold must be positive.");
 
     // decide the strategy
-#if FASTJET_VERSION_NUMBER < 30200
+#if FASTJET_VERSION_NUMBER < 30100
     // this is only supported for the Best and Native strategies
     if ((requested_strategy!=Best) && (requested_strategy!=NNH))
       throw Error("HOTVR: with FastJet<3.2.0, Best and NNH are the only supported strategies.");
@@ -113,7 +113,7 @@ namespace contrib {
     // the following code has been written by G. Soyez and is taken from
     // VariableR/VariableRPlugin.cc, version 1.2.1
     // -> make use of the NN-type clustering in FastJet 3.2 and higher
-#if FASTJET_VERSION_NUMBER >= 30200
+#if FASTJET_VERSION_NUMBER >= 30100
 
     // set up clustering strategy
     Strategy strategy = _requested_strategy;
@@ -133,7 +133,7 @@ namespace contrib {
 #endif
       fastjet::NNH<HOTVRBriefJet,HOTVRNNInfo> nnh(cs.jets(), &nninfo);
       NN_clustering(cs, nnh);
-#if FASTJET_VERSION_NUMBER >= 30200
+#if FASTJET_VERSION_NUMBER >= 30100
     }
 #endif
   }
@@ -334,7 +334,7 @@ namespace contrib {
   // decide the optimal strategy
   // taken from VariableR/VariableRPlugin.cc, version 1.2.1
   HOTVR::Strategy HOTVR::best_strategy(unsigned int N) const{
-#if FASTJET_VERSION_NUMBER >= 30200
+#if FASTJET_VERSION_NUMBER >= 30100
     // use the FastJet (v>/3.1) transition between N2Plain and N2Tiled
     if (N <= 30 || N <= 39.0/(max(_max_r, 0.1) + 0.6)) return N2Plain;
     else return N2Tiled;
