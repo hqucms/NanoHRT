@@ -8,20 +8,13 @@ cd CMSSW_9_4_10/src
 cmsenv
 ```
 
-### Use cutomized fastjet-contrib for HOTVR
-
-```bash
-scram setup /afs/cern.ch/user/h/hqu/public/tools/fastjet-contrib/slc6_amd64_gcc630/external/fastjet-contrib/1.033HOTVR/fastjet-contrib.xml
-```
-
-### Set up MXNet and DeepAK8 recipe
+### Set up DeepAK8 recipe
 
 ```bash
 # MXNet
-scram setup /afs/cern.ch/user/h/hqu/public/tools/mxnet/slc6_amd64_gcc630/external/mxnet-predict/1.2.1.mod3/mxnet-predict.xml
+scram setup /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_3_0_pre4/config/toolbox/slc6_amd64_gcc700/tools/selected/mxnet-predict.xml
 
-# NNKit
-git clone ssh://git@gitlab.cern.ch:7999/DeepAK8/NNKit.git -b for94X
+git clone ssh://git@gitlab.cern.ch:7999/DeepAK8/NNKit.git -b for94X-reclustered-jets
 ```
 
 ### Get customized NanoAOD producers for HeavyResTagging
@@ -41,4 +34,13 @@ scram b -j16
 ```bash
 cd PhysicsTools/NanoHRT/test
 cmsRun nanoHRT_cfg.py
+```
+
+### Production
+
+MC:
+
+```bash
+cmsDriver.py step1 -n -1 --mc --eventcontent NANOEDMAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein file:step-1.root --fileout file:nano.root --no_exec
+
 ```

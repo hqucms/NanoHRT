@@ -37,11 +37,12 @@
 
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/ClusterSequenceArea.hh"
-#include "fastjet/contrib/HOTVR.hh"
-#include "fastjet/contrib/HOTVRinfo.hh"
 #include "fastjet/contrib/Nsubjettiness.hh"
 #include "fastjet/contrib/XConePlugin.hh"
 #include "fastjet/contrib/SoftDrop.hh"
+
+#include "../interface/HOTVR.hh"
+#include "../interface/HOTVRinfo.hh"
 
 
 using namespace fastjet;

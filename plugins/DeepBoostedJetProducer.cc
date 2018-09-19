@@ -30,6 +30,7 @@ class DeepBoostedJetProducer : public edm::stream::EDProducer<> {
     void endStream() override {}
 
     const edm::EDGetTokenT<edm::View<pat::Jet>> src_;
+    const bool has_puppi_weighted_daughters_;
     const double jet_radius_;
     std::string nominal_nn_path_;
     std::string decorr_nn_path_;
@@ -41,6 +42,7 @@ class DeepBoostedJetProducer : public edm::stream::EDProducer<> {
 
 DeepBoostedJetProducer::DeepBoostedJetProducer(const edm::ParameterSet& iConfig)
 : src_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("src")))
+, has_puppi_weighted_daughters_(iConfig.getParameter<bool>("hasPuppiWeightedDaughters"))
 , jet_radius_(iConfig.getUntrackedParameter<double>("jet_radius", 0.8))
 , nominal_nn_path_(iConfig.getUntrackedParameter<std::string>("nominal_nn_path", "NNKit/data/ak8/full"))
 , decorr_nn_path_(iConfig.getUntrackedParameter<std::string>("decorrelated_nn_path", "NNKit/data/ak8/decorrelated"))
@@ -98,7 +100,7 @@ void DeepBoostedJetProducer::produce(edm::Event& iEvent, const edm::EventSetup& 
   auto outputs = std::make_unique<pat::JetCollection>();
 
   for (const auto &jet : *jets){
-    JetHelper jet_helper(&jet);
+    JetHelper jet_helper(&jet, has_puppi_weighted_daughters_);
 
     pat::Jet newJet(jet);
     if (fatjetNN_){

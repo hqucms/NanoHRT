@@ -92,7 +92,6 @@ def setupCA15(process, runOnMC=False, path=None):
                  doc="index of first subjet"),
             subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int,
                  doc="index of second subjet"),
-            # DeepAK8: nominal
             ecf0=Var("userFloat('ecf_0')", float, doc="ecfN_1_2_20/pow(ecfN_1_2_10,2.00)", precision=10),
             httFRec=Var("userFloat('httFRec')", float, doc="HTT frec", precision=10),
             tau32sd=Var("userFloat('tau32sd')", float, doc="soft drop tau32", precision=10),

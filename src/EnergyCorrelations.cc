@@ -1,6 +1,6 @@
 /**
  * \file EnergyCorrelations.cc
- * \brief Re-optimized code to calculate energy correlation functions. 
+ * \brief Re-optimized code to calculate energy correlation functions.
  * \author S.Narayanan
  */
 #include "../interface/EnergyCorrelations.h"
@@ -11,9 +11,9 @@
 using namespace std;
 typedef ECFCalculator C;
 
-double jetDeltaR2(const fastjet::PseudoJet& j1, const fastjet::PseudoJet& j2) 
+double jetDeltaR2(const fastjet::PseudoJet& j1, const fastjet::PseudoJet& j2)
 {
-    double dEta{j1.eta()-j2.eta()}; 
+    double dEta{j1.eta()-j2.eta()};
     double dPhi{j1.phi()-j2.phi()};
 
     if (dPhi<-PI)
@@ -67,13 +67,20 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
   int nParticles = particles.size();
 
   // cache kinematics
-  if (nParticles > (int)pT.size()) { 
+  if (nParticles > (int)pT.size()) {
     pT.resize(nParticles, 0); dR.resize(nParticles); dRBeta.resize(nParticles);
     for (int iP=0; iP!=nParticles; ++iP) {
       dR[iP].resize(nParticles, 0);
       dRBeta[iP].resize(nParticles, 0);
     }
+  } else {
+    std::fill(pT.begin(), pT.end(), 0);
+    for (int iP=0; iP!=nParticles; ++iP) {
+      std::fill(dR[iP].begin(), dR[iP].end(), 0);
+      std::fill(dRBeta[iP].begin(), dRBeta[iP].end(), 0);
+    }
   }
+  std::fill(_ecfs.begin(), _ecfs.end(), 0);
 
   for (int iP=0; iP!=nParticles; ++iP) {
     const fastjet::PseudoJet& pi = particles[iP];
@@ -81,7 +88,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
     for (int jP=0; jP!=iP; ++jP) {
       if (iP == jP) {
         dR[iP][jP] = 0;
-      } else { 
+      } else {
         const fastjet::PseudoJet& pj = particles[jP];
         dR[iP][jP] = jetDeltaR2(pi,pj);
       }
@@ -102,7 +109,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
   }
 
   for (int bI = 0; bI != _bN; ++bI) {
-    
+
     // reweight angles
     double halfBeta{_bs[bI] / 2.};
     for (int iP=0; iP!=nParticles; ++iP) {
@@ -124,7 +131,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
       continue;
 
     // reset the accumulators
-    for (auto& v : vals) 
+    for (auto& v : vals)
       std::fill(v.begin(), v.end(), 0);
 
     // now we loop
@@ -136,17 +143,17 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
 
         vals[1][0] += pt_ij * angle_ij;
 
-        if (_nN > 2) { 
+        if (_nN > 2) {
           for (int kP = 0; kP != jP; ++kP) {
             const double angle_ik = dRBeta[iP][kP], angle_jk = dRBeta[jP][kP];
             const double pt_ijk = pt_ij * pT[kP];
 
-            angles3[0] = angle_ij; 
-            angles3[1] = angle_ik; 
+            angles3[0] = angle_ij;
+            angles3[1] = angle_ik;
             angles3[2] = angle_jk;
 
             insertion_sort(angles3);
-            
+
             // unrolling this appears to be faster than a for loop
             double inc3 = pt_ijk * angles3[0];
             vals[2][0] += inc3;
@@ -156,7 +163,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
 
             if (_nN > 3) {
               // Set these outside of the  lP loop as long as the sorting
-              // algorithm we use is not in-place 
+              // algorithm we use is not in-place
               // If we are using an in-place sort, this needs to be moved down
               angles4[0] = angle_ij;
               angles4[1] = angle_ik;
@@ -164,15 +171,15 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
 
               for (int lP = 0; lP != kP; ++lP) {
                 const double pt_ijkl = pt_ijk * pT[lP];
-                angles4[3] = dRBeta[iP][lP]; 
+                angles4[3] = dRBeta[iP][lP];
                 angles4[4] = dRBeta[jP][lP];
                 angles4[5] = dRBeta[kP][lP];
 
-                // The best-performing algorithm to find the 2- or 
-                // 3-smallest elements appears to be as below. 
-                // I have a number of other options in the header that were tested, 
-                // all demonstrably worse. 
-                // The exact performance of this sorting is critical, since it's called 
+                // The best-performing algorithm to find the 2- or
+                // 3-smallest elements appears to be as below.
+                // I have a number of other options in the header that were tested,
+                // all demonstrably worse.
+                // The exact performance of this sorting is critical, since it's called
                 // O(4e8) times/event.
                 // "This is the worst sorting algorithm, except for all the other
                 // ones that have been tried" -Winsort Churchill
@@ -197,7 +204,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
                 double inc4 = pt_ijkl * angle1;
                 vals[3][0] += inc4;
                 inc4 *= angle2; vals[3][1] += inc4;
-                
+
               } // l
             } // N > 3
 
@@ -206,7 +213,7 @@ void C::calculate(const vector<fastjet::PseudoJet>& particles)
       } // j
     } // i
 
-  
+
     // set the values
     double val2 = vals[1][0];
     val2 /= norm2;
