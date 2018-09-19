@@ -56,6 +56,11 @@ def createConfig(args, dataset):
 
     config.Site.storageSite = args.site
 
+    if args.fnal:
+        config.Data.ignoreLocality = True
+        config.Site.whitelist = ['T3_US_FNALLPC']
+        config.Site.ignoreGlobalBlacklist = True
+
     return config
 
 
@@ -110,6 +115,10 @@ def main():
     parser.add_argument('--dryrun',
                         action='store_true', default=False,
                         help='Only print the commands but do not submit. Default: %(default)s'
+                        )
+    parser.add_argument('--fnal',
+                        action='store_true', default=False,
+                        help='Run at FNAL LPC. Default: %(default)s'
                         )
     args = parser.parse_args()
 
