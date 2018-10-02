@@ -209,7 +209,6 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
 
         const auto* daughter = daughtersOfJet.at(i);
 
-        float puppiWt = daughter->puppiWeight();
         if (daughter->pt() < 0.5) continue;
 
         float dau_px = daughter->px();
@@ -233,8 +232,8 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
         jetFJparticles_transformed.push_back( PseudoJet( thisParticleLV_transformed.X(), thisParticleLV_transformed.Y(), thisParticleLV_transformed.Z(), thisParticleLV_transformed.T() ) );
 
 
-        if (daughter->pt()/puppiWt > 1.0)
-            qxptsum += daughter->charge() * pow( daughter->pt()/puppiWt, m_jetChargeKappa);
+        if (daughter->pt() > 1.0)
+            qxptsum += daughter->charge() * pow( daughter->pt(), m_jetChargeKappa);
 
 
         thisParticleLV_jet.Boost( -thisJetLV.BoostVector() );

@@ -8,15 +8,16 @@ def nanoHRT_customizeCommon(process, runOnMC):
     setupCustomizedAK8(process, runOnMC=runOnMC)
     setupCA15(process, runOnMC=runOnMC)
     setupHOTVR(process, runOnMC=runOnMC)
-    process.NANOAODSIMoutput.fakeNameForCrab = cms.untracked.bool(True)  # needed for crab publication
     return process
 
 
 def nanoHRT_customizeData(process):
     process = nanoHRT_customizeCommon(process, False)
+    process.NANOAODoutput.fakeNameForCrab = cms.untracked.bool(True)  # needed for crab publication
     return process
 
 
 def nanoHRT_customizeMC(process):
     process = nanoHRT_customizeCommon(process, True)
+    process.NANOAODSIMoutput.fakeNameForCrab = cms.untracked.bool(True)  # needed for crab publication
     return process

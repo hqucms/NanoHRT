@@ -37,8 +37,8 @@ class BESTProducer : public edm::stream::EDProducer<> {
 
 BESTProducer::BESTProducer(const edm::ParameterSet& iConfig)
 : src_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("src")))
-, cfg_path_(iConfig.getUntrackedParameter<edm::FileInPath>("config_path", edm::FileInPath("PhysicsTools/NanoHRT/data/BEST/config.txt")))
-, dnn_path_(iConfig.getUntrackedParameter<edm::FileInPath>("dnn_path", edm::FileInPath("PhysicsTools/NanoHRT/data/BEST/BEST_6bin_PUPPI.json")))
+, cfg_path_(iConfig.getParameter<edm::FileInPath>("config_path"))
+, dnn_path_(iConfig.getParameter<edm::FileInPath>("dnn_path"))
 {
 
   tagger_ = std::make_unique<BoostedEventShapeTagger>(cfg_path_.fullPath(), dnn_path_.fullPath());
