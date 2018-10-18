@@ -1,4 +1,4 @@
-dnnFile BEST_6bin_PUPPI.json 
+dnnFile BEST_6bin_CHS.json
 applyKinematicCuts true
 radiusSmall 0.4
 radiusLarge 0.8

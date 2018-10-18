@@ -209,8 +209,7 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
 
         const auto* daughter = daughtersOfJet.at(i);
 
-        float puppiWt = daughter->puppiWeight();
-        if (puppiWt*daughter->pt() < 0.5) continue;
+        if (daughter->pt() < 0.5) continue;
 
         float dau_px = daughter->px();
         float dau_py = daughter->py();
@@ -233,13 +232,6 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
         jetFJparticles_transformed.push_back( PseudoJet( thisParticleLV_transformed.X(), thisParticleLV_transformed.Y(), thisParticleLV_transformed.Z(), thisParticleLV_transformed.T() ) );
 
 
-
-
-        thisParticleLV_jet *= puppiWt;
-        thisParticleLV_top *= puppiWt;
-        thisParticleLV_W *= puppiWt;
-        thisParticleLV_Z *= puppiWt;
-        thisParticleLV_H *= puppiWt;
         if (daughter->pt() > 1.0)
             qxptsum += daughter->charge() * pow( daughter->pt(), m_jetChargeKappa);
 
@@ -483,7 +475,7 @@ void BoostedEventShapeTagger::getJetValues( const pat::Jet& jet ){
     m_BESTvars["et"]      = thisJet.Pt();
     m_BESTvars["eta"]     = thisJet.Rapidity();
     m_BESTvars["mass"]    = thisJet.M();
-    m_BESTvars["SDmass"]  = jet.userFloat("ak8PFJetsPuppiSoftDropMass");
+    m_BESTvars["SDmass"]  = jet.groomedMass();
     m_BESTvars["tau32"]   = (tau2 > 1e-8) ? tau3/tau2 : 999.;
     m_BESTvars["tau21"]   = (tau1 > 1e-8) ? tau2/tau1 : 999.;
     m_BESTvars["q"]       = jetq;

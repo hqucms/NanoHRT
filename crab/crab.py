@@ -1,11 +1,13 @@
+#!/usr/bin/env python
 from __future__ import print_function
 
 import argparse
 import re
-import logging
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 
 from CRABAPI.RawCommand import crabCommand
+
+import logging
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 
 
 def parseDatasetName(dataset):
@@ -64,10 +66,40 @@ def createConfig(args, dataset):
     return config
 
 
+def resubmit(args):
+    import os
+    for dirname in os.listdir(args.work_area):
+        logging.info('Resubmitting job %s' % dirname)
+        crabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname))
+
+def status(args):
+    import os
+    jobnames = os.listdir(args.work_area)
+    finished = 0
+    job_status = {}
+    submit_failed = []
+    for dirname in jobnames:
+        logging.info('Checking status of job %s' % dirname)
+        ret = crabCommand('status', dir='%s/%s' % (args.work_area, dirname))
+        job_status[dirname] = ret['status']
+        if ret['status'] == 'COMPLETED':
+            finished += 1
+        elif ret['dbStatus'] == 'SUBMITFAILED':
+            submit_failed.append(ret['inputDataset'])
+        else:
+            pass
+
+    logging.info('====== Summary ======\n' +
+                 '\n'.join(['%s: %s' % (k, job_status[k]) for k in job_status]))
+    logging.info('%d/%d jobs complted!' % (finished, len(jobnames)))
+    if len(submit_failed):
+        logging.warning('Submit failed:\n%s' % '\n'.join(submit_failed))
+
+
 def main():
 
     parser = argparse.ArgumentParser('Submit crab jobs')
-    parser.add_argument('inputfile',
+    parser.add_argument('-i', '--inputfile',
                         help='File with list of input datasets'
                         )
     parser.add_argument('-o', '--outputdir',
@@ -120,7 +152,23 @@ def main():
                         action='store_true', default=False,
                         help='Run at FNAL LPC. Default: %(default)s'
                         )
+    parser.add_argument('--status',
+                        action='store_true', default=False,
+                        help='Check job status. Default: %(default)s'
+                        )
+    parser.add_argument('--resubmit',
+                        action='store_true', default=False,
+                        help='Resubmit jobs. Default: %(default)s'
+                        )
     args = parser.parse_args()
+
+    if args.status:
+        status(args)
+        return
+
+    if args.resubmit:
+        resubmit(args)
+        return
 
     with open(args.inputfile) as inputfile:
         for l in inputfile:

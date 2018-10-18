@@ -39,8 +39,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     # BEST
     process.boostedEventShapeJetsAK8Puppi = cms.EDProducer('BESTProducer',
         src=cms.InputTag('deepBoostedJetsAK8Puppi'),
-        config_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/BEST/config.txt'),
-        dnn_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/BEST/BEST_6bin_PUPPI.json'),
+        config_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/config.txt'),
+        dnn_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/BEST_6bin_CHS.json'),
     )
 
     # src
@@ -145,12 +145,12 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             nnMDQCDc=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_c')", float, doc="Mass-decorrelated DeepAK8 score QCD_c", precision=-1),
             nnMDQCDothers=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_others')", float, doc="Mass-decorrelated DeepAK8 score QCD_others", precision=-1),
             # BEST Tagger
-            bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=10),
-            bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=10),
-            bestZ=Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=10),
-            bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=10),
-            bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=10),
-            bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=10),
+            bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
+            bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
+            bestZ=Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=-1),
+            bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1),
+            bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1),
+            bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1),
         )
     )
     run2_miniAOD_80XLegacy.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))

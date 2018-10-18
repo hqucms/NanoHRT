@@ -66,10 +66,10 @@ class BoostedEventShapeTagger {
     float m_jetChargeKappa;     // weight for jet charge pT
     size_t m_maxJetSize;        // number of jets in re-clustering
 
-    float m_Wmass = 80.4;       // W mass [GeV]
-    float m_Zmass = 91.2;       // Z mass
-    float m_Hmass = 125.;       // Higgs mass
-    float m_Tmass = 172.5;      // Top mass
+    static constexpr float m_Wmass = 80.4;       // W mass [GeV]
+    static constexpr float m_Zmass = 91.2;       // Z mass
+    static constexpr float m_Hmass = 125.;       // Higgs mass
+    static constexpr float m_Tmass = 172.5;      // Top mass
 
     std::map<std::string,std::string> m_defaultConfigs = {
              {"dnnFile",             "BESTAnalysis/BoostedEventShapeTagger/data/BEST_6bin_PUPPI.json"},
