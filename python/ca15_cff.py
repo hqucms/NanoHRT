@@ -26,6 +26,10 @@ def setupCA15(process, runOnMC=False, path=None):
                addSoftDrop=True, addSoftDropSubjets=True, subJETCorrPayload='AK4PFPuppi', subJETCorrLevels=JETCorrLevels,
                bTagDiscriminators=bTagDiscriminators, subjetBTagDiscriminators=subjetBTagDiscriminators)
 
+    if runOnMC:
+        process.ca15GenJetsNoNu.jetPtMin = 100
+        process.ca15GenJetsNoNuSoftDrop.jetPtMin = 100
+
     # ECFTopTag
     process.ecfTopTagCA15Puppi = cms.EDProducer('ECFTopTagsProducer',
         src=cms.InputTag('packedPatJetsCA15PFPuppiSoftDrop'),
@@ -119,12 +123,40 @@ def setupCA15(process, runOnMC=False, path=None):
 
     process.ca15Task = cms.Task(
         process.ecfTopTagCA15Puppi,
-        process.ca15Table,
         process.tightJetIdCA15Puppi,
         process.tightJetIdLepVetoCA15Puppi,
         process.ca15WithUserData,
+        process.ca15Table,
         process.ca15SubJetTable
         )
+
+    if runOnMC:
+        process.genJetCA15Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
+            src=cms.InputTag("ca15GenJetsNoNu"),
+            cut=cms.string("pt > 100."),
+            name=cms.string("GenJetCA15"),
+            doc=cms.string("CA15 GenJets made with visible genparticles"),
+            singleton=cms.bool(False),  # the number of entries is variable
+            extension=cms.bool(False),  # this is the main table for the genjets
+            variables=cms.PSet(P4Vars,
+            )
+        )
+        process.genJetCA15Table.variables.pt.precision = 10
+
+        process.genSubJetCA15Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
+            src=cms.InputTag("ca15GenJetsNoNuSoftDrop", "SubJets"),
+            cut=cms.string(""),
+            name=cms.string("GenSubJetCA15"),
+            doc=cms.string("CA15 Gen-SubJets made with visible genparticles"),
+            singleton=cms.bool(False),  # the number of entries is variable
+            extension=cms.bool(False),  # this is the main table for the genjets
+            variables=cms.PSet(P4Vars,
+            )
+        )
+        process.genSubJetCA15Table.variables.pt.precision = 10
+
+        process.ca15Task.add(process.genJetCA15Table)
+        process.ca15Task.add(process.genSubJetCA15Table)
 
     _ca15Task_80X = process.ca15Task.copy()
     _ca15Task_80X.replace(process.tightJetIdLepVetoCA15Puppi, process.looseJetIdCA15Puppi)

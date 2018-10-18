@@ -23,22 +23,29 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                PUMethod='Puppi', JETCorrPayload='AK8PFPuppi', JETCorrLevels=JETCorrLevels,
                Cut='pt > 170.0 && abs(rapidity()) < 2.4',
                miniAOD=True, runOnMC=runOnMC,
-               addNsub=True, maxTau=4, addEnergyCorrFunc=True,
+               addNsub=True, maxTau=3, addEnergyCorrFunc=True,
                addSoftDrop=True, addSoftDropSubjets=True, subJETCorrPayload='AK4PFPuppi', subJETCorrLevels=JETCorrLevels,
                bTagDiscriminators=bTagDiscriminators, subjetBTagDiscriminators=subjetBTagDiscriminators)
 
+    if runOnMC:
+        process.ak8GenJetsNoNu.jetPtMin = 100
+        process.ak8GenJetsNoNuSoftDrop.jetPtMin = 100
+
     # DeepAK8
-    process.deepBoostedJetsAK8Puppi = cms.EDProducer('DeepBoostedJetProducer',
-        src=cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop'),
-        hasPuppiWeightedDaughters=cms.bool(True),
-        jet_radius=cms.untracked.double(0.8),
-        nominal_nn_path=cms.untracked.string('NNKit/data/ak8/full'),
-        decorrelated_nn_path=cms.untracked.string('NNKit/data/ak8/decorrelated'),
+    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfDeepBoostedJetTagsProbs, _pfMassDecorrelatedDeepBoostedJetTagsProbs
+    updateJetCollection(
+        process,
+        jetSource=cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop'),
+        rParam=0.8,
+        jetCorrections=('AK8PFPuppi', cms.vstring(['L2Relative', 'L3Absolute']), 'None'),
+        btagDiscriminators=bTagDiscriminators + _pfDeepBoostedJetTagsProbs + _pfMassDecorrelatedDeepBoostedJetTagsProbs,
+        postfix='AK8WithPuppiDaughters',
     )
 
     # BEST
     process.boostedEventShapeJetsAK8Puppi = cms.EDProducer('BESTProducer',
-        src=cms.InputTag('deepBoostedJetsAK8Puppi'),
+        src=cms.InputTag('selectedUpdatedPatJetsAK8WithPuppiDaughters'),
         config_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/config.txt'),
         dnn_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/BEST_6bin_CHS.json'),
     )
@@ -108,42 +115,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                  doc="index of first subjet"),
             subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int,
                  doc="index of second subjet"),
-            # DeepAK8: nominal
-            nnTbcq=Var("userFloat('DeepBoostedJet:nn_Top_bcq')", float, doc="DeepAK8 score Top_bcq", precision=-1),
-            nnTbqq=Var("userFloat('DeepBoostedJet:nn_Top_bqq')", float, doc="DeepAK8 score Top_bqq", precision=-1),
-            nnTbc=Var("userFloat('DeepBoostedJet:nn_Top_bc')", float, doc="DeepAK8 score Top_bc", precision=-1),
-            nnTbq=Var("userFloat('DeepBoostedJet:nn_Top_bq')", float, doc="DeepAK8 score Top_bq", precision=-1),
-            nnWcq=Var("userFloat('DeepBoostedJet:nn_W_cq')", float, doc="DeepAK8 score W_cq", precision=-1),
-            nnWqq=Var("userFloat('DeepBoostedJet:nn_W_qq')", float, doc="DeepAK8 score W_qq", precision=-1),
-            nnZbb=Var("userFloat('DeepBoostedJet:nn_Z_bb')", float, doc="DeepAK8 score Z_bb", precision=-1),
-            nnZcc=Var("userFloat('DeepBoostedJet:nn_Z_cc')", float, doc="DeepAK8 score Z_cc", precision=-1),
-            nnZqq=Var("userFloat('DeepBoostedJet:nn_Z_qq')", float, doc="DeepAK8 score Z_qq", precision=-1),
-            nnHbb=Var("userFloat('DeepBoostedJet:nn_H_bb')", float, doc="DeepAK8 score nnHbb", precision=-1),
-            nnHcc=Var("userFloat('DeepBoostedJet:nn_H_cc')", float, doc="DeepAK8 score nnHcc", precision=-1),
-            nnHqqqq=Var("userFloat('DeepBoostedJet:nn_H_qqqq')", float, doc="DeepAK8 score nnHqqqq", precision=-1),
-            nnQCDbb=Var("userFloat('DeepBoostedJet:nn_QCD_bb')", float, doc="DeepAK8 score QCD_bb", precision=-1),
-            nnQCDcc=Var("userFloat('DeepBoostedJet:nn_QCD_cc')", float, doc="DeepAK8 score QCD_cc", precision=-1),
-            nnQCDb=Var("userFloat('DeepBoostedJet:nn_QCD_b')", float, doc="DeepAK8 score QCD_b", precision=-1),
-            nnQCDc=Var("userFloat('DeepBoostedJet:nn_QCD_c')", float, doc="DeepAK8 score QCD_c", precision=-1),
-            nnQCDothers=Var("userFloat('DeepBoostedJet:nn_QCD_others')", float, doc="DeepAK8 score QCD_others", precision=-1),
-            # DeepAK8: decorrelated
-            nnMDTbcq=Var("userFloat('DeepBoostedJet:decorr_nn_Top_bcq')", float, doc="Mass-decorrelated DeepAK8 score Top_bcq", precision=-1),
-            nnMDTbqq=Var("userFloat('DeepBoostedJet:decorr_nn_Top_bqq')", float, doc="Mass-decorrelated DeepAK8 score Top_bqq", precision=-1),
-            nnMDTbc=Var("userFloat('DeepBoostedJet:decorr_nn_Top_bc')", float, doc="Mass-decorrelated DeepAK8 score Top_bc", precision=-1),
-            nnMDTbq=Var("userFloat('DeepBoostedJet:decorr_nn_Top_bq')", float, doc="Mass-decorrelated DeepAK8 score Top_bq", precision=-1),
-            nnMDWcq=Var("userFloat('DeepBoostedJet:decorr_nn_W_cq')", float, doc="Mass-decorrelated DeepAK8 score W_cq", precision=-1),
-            nnMDWqq=Var("userFloat('DeepBoostedJet:decorr_nn_W_qq')", float, doc="Mass-decorrelated DeepAK8 score W_qq", precision=-1),
-            nnMDZbb=Var("userFloat('DeepBoostedJet:decorr_nn_Z_bb')", float, doc="Mass-decorrelated DeepAK8 score Z_bb", precision=-1),
-            nnMDZcc=Var("userFloat('DeepBoostedJet:decorr_nn_Z_cc')", float, doc="Mass-decorrelated DeepAK8 score Z_cc", precision=-1),
-            nnMDZqq=Var("userFloat('DeepBoostedJet:decorr_nn_Z_qq')", float, doc="Mass-decorrelated DeepAK8 score Z_qq", precision=-1),
-            nnMDHbb=Var("userFloat('DeepBoostedJet:decorr_nn_H_bb')", float, doc="Mass-decorrelated DeepAK8 score nnHbb", precision=-1),
-            nnMDHcc=Var("userFloat('DeepBoostedJet:decorr_nn_H_cc')", float, doc="Mass-decorrelated DeepAK8 score nnHcc", precision=-1),
-            nnMDHqqqq=Var("userFloat('DeepBoostedJet:decorr_nn_H_qqqq')", float, doc="Mass-decorrelated DeepAK8 score nnHqqqq", precision=-1),
-            nnMDQCDbb=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_bb')", float, doc="Mass-decorrelated DeepAK8 score QCD_bb", precision=-1),
-            nnMDQCDcc=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_cc')", float, doc="Mass-decorrelated DeepAK8 score QCD_cc", precision=-1),
-            nnMDQCDb=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_b')", float, doc="Mass-decorrelated DeepAK8 score QCD_b", precision=-1),
-            nnMDQCDc=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_c')", float, doc="Mass-decorrelated DeepAK8 score QCD_c", precision=-1),
-            nnMDQCDothers=Var("userFloat('DeepBoostedJet:decorr_nn_QCD_others')", float, doc="Mass-decorrelated DeepAK8 score QCD_others", precision=-1),
+            nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
+            nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
             # BEST Tagger
             bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
             bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
@@ -155,6 +128,16 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     )
     run2_miniAOD_80XLegacy.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
     process.customAK8Table.variables.pt.precision = 10
+
+    # add DeepAK8 scores: nominal
+    for prob in _pfDeepBoostedJetTagsProbs:
+        name = prob.split(':')[1].replace('prob', 'nn')
+        setattr(process.customAK8Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
+
+    # add DeepAK8 scores: mass decorrelated
+    for prob in _pfMassDecorrelatedDeepBoostedJetTagsProbs:
+        name = prob.split(':')[1].replace('prob', 'nnMD')
+        setattr(process.customAK8Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
 
     process.customAK8SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropPacked", "SubJets"),
@@ -168,12 +151,13 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             btagCSVV2=Var("bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')", float, doc=" pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)", precision=10),
             rawFactor=Var("1.-jecFactor('Uncorrected')", float, doc="1 - Factor to get back to raw pT", precision=6),
             area=Var("jetArea()", float, doc="jet catchment area, for JECs", precision=10),
+            nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
+            nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
         )
     )
     process.customAK8SubJetTable.variables.pt.precision = 10
 
     process.customizedAK8Task = cms.Task(
-        process.deepBoostedJetsAK8Puppi,
         process.boostedEventShapeJetsAK8Puppi,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
@@ -181,6 +165,34 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.customAK8Table,
         process.customAK8SubJetTable
         )
+
+    if runOnMC:
+        process.customGenJetAK8Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
+            src=cms.InputTag("ak8GenJetsNoNu"),
+            cut=cms.string("pt > 100."),
+            name=cms.string("CustomGenJetAK8"),
+            doc=cms.string("AK8 GenJets made with visible genparticles"),
+            singleton=cms.bool(False),  # the number of entries is variable
+            extension=cms.bool(False),  # this is the main table for the genjets
+            variables=cms.PSet(P4Vars,
+            )
+        )
+        process.customGenJetAK8Table.variables.pt.precision = 10
+
+        process.customGenSubJetAK8Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
+            src=cms.InputTag("ak8GenJetsNoNuSoftDrop", "SubJets"),
+            cut=cms.string(""),
+            name=cms.string("CustomGenSubJetAK8"),
+            doc=cms.string("AK8 Gen-SubJets made with visible genparticles"),
+            singleton=cms.bool(False),  # the number of entries is variable
+            extension=cms.bool(False),  # this is the main table for the genjets
+            variables=cms.PSet(P4Vars,
+            )
+        )
+        process.customGenSubJetAK8Table.variables.pt.precision = 10
+
+        process.customizedAK8Task.add(process.customGenJetAK8Table)
+        process.customizedAK8Task.add(process.customGenSubJetAK8Table)
 
     _customizedAK8Task_80X = process.customizedAK8Task.copy()
     _customizedAK8Task_80X.replace(process.tightJetIdLepVetoCustomAK8, process.looseJetIdCustomAK8)

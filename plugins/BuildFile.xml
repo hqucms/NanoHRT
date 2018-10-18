@@ -3,7 +3,6 @@
 <library file="*.cc" name="PhysicsToolsNanoHRTPlugins">
   <use name="DataFormats/PatCandidates"/>
   <use name="RecoJets/JetAlgorithms"/>
-  <use name="NNKit/FatJetNN"/>
   <use name="PhysicsTools/NanoHRT"/>
   <use name="roottmva"/>
   <use name="fastjet"/>
