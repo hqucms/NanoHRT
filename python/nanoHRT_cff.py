@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+from PhysicsTools.NanoHRT.ak4_cff import setupCustomizedAK4
 from PhysicsTools.NanoHRT.ak8_cff import setupCustomizedAK8
 from PhysicsTools.NanoHRT.ca15_cff import setupCA15
 from PhysicsTools.NanoHRT.hotvr_cff import setupHOTVR

@@ -81,7 +81,7 @@ def setupCustomizedAK4(process, runOnMC=False, path=None):
         src=cms.InputTag("customAK4WithUserData"),
         name=cms.string("CustomAK4CHS"),
         cut=cms.string(""),
-        doc=cms.string("lepton subtracted AK4"),
+        doc=cms.string("muon subtracted AK4"),
         singleton=cms.bool(False),  # the number of entries is variable
         extension=cms.bool(False),  # this is the main table for the jets
         variables=cms.PSet(P4Vars,
