@@ -5,6 +5,8 @@
 <use   name="PhysicsTools/CandUtils"/>
 <use   name="fastjet"/>
 <use   name="lwtnn"/>
+<use   name="PhysicsTools/TensorFlow" />
+
 <export>
   <lib   name="1"/>
 </export>

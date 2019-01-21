@@ -5,6 +5,7 @@ from PhysicsTools.NanoHRT.hotvr_cff import setupHOTVR
 
 
 def nanoHRT_customizeCommon(process, runOnMC):
+    setupCustomizedAK4(process, runOnMC=runOnMC)
     setupCustomizedAK8(process, runOnMC=runOnMC)
     setupCA15(process, runOnMC=runOnMC)
     setupHOTVR(process, runOnMC=runOnMC)
