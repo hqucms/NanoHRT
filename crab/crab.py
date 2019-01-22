@@ -8,6 +8,13 @@ import logging
 from CRABAPI.RawCommand import crabCommand
 
 
+def runCrabCommand(command, *args, **kwargs):
+    try:
+        return crabCommand(command, *args, **kwargs)
+    except Exception as e:
+        print(getattr(e, 'message', repr(e)))
+
+
 def natural_sort(l):
     convert = lambda text: int(text) if text.isdigit() else text.lower()
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
@@ -22,7 +29,6 @@ def configLogger(name, loglevel=logging.INFO):
     console.setLevel(loglevel)
     console.setFormatter(logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s'))
     logger.addHandler(console)
-
 
 logger = logging.getLogger(__name__)
 configLogger(__name__)
@@ -96,13 +102,33 @@ def createConfig(args, dataset):
 
 
 def parseOptions(args):
+
+    def convertValue(v):
+        if v.lower() == 'true':
+            v = True
+        elif v.lower() == 'false':
+            v = False
+        return v
     options = {}
     if args.options:
+        prev = None
         for opt in args.options.split():
-            k, v = opt.split('=')
-            if k.startswith('--'):
-                k = k[2:]
-            options[k] = v
+            if '=' in opt:
+                k, v = opt.split('=')
+                if k.startswith('--'):
+                    k = k[2:]
+                options[k] = convertValue(v)
+            else:
+                if opt.startswith('--'):
+                    if prev is None:
+                        prev = opt[2:]
+                        continue
+                    else:
+                        options[prev] = True
+                        prev = opt[2:]
+                else:
+                    options[prev] = convertValue(opt)
+                    prev = None
     return options
 
 
@@ -110,10 +136,7 @@ def killjobs(args):
     import os
     for dirname in os.listdir(args.work_area):
         logger.info('Kill job %s' % dirname)
-        try:
-            crabCommand('kill', dir='%s/%s' % (args.work_area, dirname))
-        except:
-            pass
+        runCrabCommand('kill', dir='%s/%s' % (args.work_area, dirname))
 
 
 def resubmit(args):
@@ -121,10 +144,7 @@ def resubmit(args):
     kwargs = parseOptions(args)
     for dirname in os.listdir(args.work_area):
         logger.info('Resubmitting job %s with options %s' % (dirname, str(kwargs)))
-        try:
-            crabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname), **kwargs)
-        except:
-            pass
+        runCrabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname), **kwargs)
 
 
 def _analyze_crab_status(ret):
@@ -160,7 +180,7 @@ def status(args):
     submit_failed = []
     for dirname in jobnames:
         logger.info('Checking status of job %s' % dirname)
-        ret = crabCommand('status', dir='%s/%s' % (args.work_area, dirname))
+        ret = runCrabCommand('status', dir='%s/%s' % (args.work_area, dirname))
         states = _analyze_crab_status(ret)
         try:
             percent_finished = 100.*states['finished'] / sum(states.values())
@@ -168,17 +188,22 @@ def status(args):
             percent_finished = 0
         pcts_str = ' (\033[1;%dm%.1f%%\033[0m)' % (32 if percent_finished > 90 else 34 if percent_finished > 70 else 35 if percent_finished > 50 else 31, percent_finished)
         job_status[dirname] = ret['status'] + pcts_str + '\n    ' + str(states)
+        if ret['publicationEnabled']:
+            pcts_published = 100.*ret['publication'].get('done', 0) / sum(states.values())
+            pub_pcts_str = '\033[1;%dm%.1f%%\033[0m' % (32 if pcts_published > 90 else 34 if pcts_published > 70 else 35 if pcts_published > 50 else 31, pcts_published)
+            job_status[dirname] = job_status[dirname] + '\n    publication: ' + pub_pcts_str + ' ' + str(ret['publication'])
+
         if ret['status'] == 'COMPLETED':
             finished += 1
         elif ret['dbStatus'] == 'SUBMITFAILED':
             submit_failed.append(ret['inputDataset'])
-        else:
-            try:
-                if states['failed'] > 0 and not args.no_resubmit:
-                    logger.info('Resubmitting job %s with options %s' % (dirname, str(kwargs)))
-                    crabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname), **kwargs)
-            except:
-                pass
+        elif states.get('failed', 0) > 0 and 'killed' not in ret['status'].lower() and not args.no_resubmit:
+                logger.info('Resubmitting job %s with options %s' % (dirname, str(kwargs)))
+                runCrabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname), **kwargs)
+
+        if ret['publication'].get('failed', 0) > 0:
+            logger.info('Resubmitting job %s for failed publication' % dirname)
+            runCrabCommand('resubmit', dir='%s/%s' % (args.work_area, dirname), publication=True)
 
     logger.info('====== Summary ======\n' +
                  '\n'.join(['%s: %s' % (k, job_status[k]) for k in natural_sort(job_status.keys())]))
@@ -293,7 +318,7 @@ def main():
                 print(cfg)
                 continue
             logger.info('Submitting dataset %s' % dataset)
-            crabCommand('submit', config=cfg)
+            runCrabCommand('submit', config=cfg)
 
 
 if __name__ == '__main__':
