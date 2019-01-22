@@ -3,8 +3,8 @@
 ### Set up CMSSW
 
 ```bash
-cmsrel CMSSW_9_4_11_cand1
-cd CMSSW_9_4_11_cand1/src
+cmsrel CMSSW_9_4_12
+cd CMSSW_9_4_12/src
 cmsenv
 ```
 
@@ -23,13 +23,14 @@ scram b -j16
 ### Test
 
 ```bash
+mkdir PhysicsTools/NanoHRT/test
 cd PhysicsTools/NanoHRT/test
 ```
 
 MC:
 
 ```bash
-cmsDriver.py test_nanoHRT_mc -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein /store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root --fileout file:nano_mc.root >& test_mc.log &
+cmsDriver.py test_nanoHRT_mc -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein /store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root --fileout file:nano_mc.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc.log &
 
 less +F test_mc.log
 ```
@@ -37,7 +38,7 @@ less +F test_mc.log
 Data:
 
 ```bash
-cmsDriver.py test_nanoHRT_data -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 94X_dataRun2_v4 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData_METMuEGClean --filein /store/data/Run2016G/JetHT/MINIAOD/03Feb2017-v1/100000/006E7AF2-AEEC-E611-A88D-7845C4FC3B00.root --fileout file:nano_data.root >& test_data.log &
+cmsDriver.py test_nanoHRT_data -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 94X_dataRun2_v4 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData_METMuEGClean --filein /store/data/Run2016G/JetHT/MINIAOD/03Feb2017-v1/100000/006E7AF2-AEEC-E611-A88D-7845C4FC3B00.root --fileout file:nano_data.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data.log &
 
 less +F test_data.log
 ```
@@ -48,7 +49,7 @@ less +F test_data.log
 **Step 0**: switch to the crab production directory and set up grid proxy, CRAB environment, etc.
 
 ```bash
-cd $CMSSW_BASE/PhysicsTools/NanoHRT/crab
+cd $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
 # set up grid proxy
 voms-proxy-init -rfc -voms cms --valid 168:00
 # set up CRAB env (must be done after cmsenv)
