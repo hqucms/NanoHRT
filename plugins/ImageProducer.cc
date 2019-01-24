@@ -46,6 +46,7 @@ class ImageProducer : public edm::stream::EDProducer<edm::GlobalCache<ImageTFCac
     const edm::EDGetTokenT<edm::View<pat::Jet>> sj_;
     std::string sdmcoll_;
     edm::FileInPath pb_path_;
+    std::string extex_;
 
 };
 
@@ -54,7 +55,8 @@ ImageProducer::ImageProducer(const edm::ParameterSet& iConfig,  const ImageTFCac
  tfsession_(nullptr)
 , src_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("src")))
 , sj_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("sj")))
-, sdmcoll_((iConfig.getParameter<std::string>("sdmcoll")))
+, sdmcoll_(iConfig.getParameter<std::string>("sdmcoll"))
+, extex_(iConfig.getParameter<std::string>("extex"))
 {
   
   produces<pat::JetCollection>();
@@ -84,7 +86,7 @@ std::unique_ptr<ImageTFCache> ImageProducer::initializeGlobalCache(
   tensorflow::setLogging("3");
   ImageTFCache* cache = new ImageTFCache();
 
-  cache->graphDef = tensorflow::loadGraphDef(iConfig.getUntrackedParameter<edm::FileInPath>("pb_path", edm::FileInPath("PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_12032018.pb")).fullPath());
+  cache->graphDef = tensorflow::loadGraphDef(iConfig.getUntrackedParameter<edm::FileInPath>("pb_path").fullPath());
   return std::unique_ptr<ImageTFCache>(cache);
 }
 
@@ -367,7 +369,7 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   jindex=0;
   for (const auto &jet : *jets){
     pat::Jet newJet(jet);
-    newJet.addUserFloat("Image:top", itopdisc[jindex]);
+    newJet.addUserFloat("Image"+extex_+":top", itopdisc[jindex]);
     outputs->push_back(newJet);
     jindex+=1;
   }

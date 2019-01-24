@@ -71,11 +71,21 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         src=cms.InputTag('boostedEventShapeJetsAK8Puppi'),
         sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
         sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
-        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_12032018.pb'),
+        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_01232018.pb'),
+        extex=cms.string('')
     )
 
+    process.imageJetsAK8PuppiMD = cms.EDProducer('ImageProducer',
+        src=cms.InputTag('imageJetsAK8Puppi'),
+        sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
+        sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
+        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_MD_01232018.pb'),
+        extex=cms.string('MD')
+    )
+
+
     # src
-    srcJets = cms.InputTag('imageJetsAK8Puppi')
+    srcJets = cms.InputTag('imageJetsAK8PuppiMD')
 
     # jetID
     process.looseJetIdCustomAK8 = cms.EDProducer("PatJetIDValueMapProducer",
@@ -148,7 +158,9 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1),
             bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1),
             bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1),
-            imageTop=Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1),
+            itop=Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1),
+            iMDtop=Var("userFloat('ImageMD:top')", float, doc="Image tagger score top", precision=-1),
+
         )
     )
     run2_miniAOD_80XLegacy.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
@@ -185,6 +197,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customizedAK8Task = cms.Task(
         process.boostedEventShapeJetsAK8Puppi,
         process.imageJetsAK8Puppi,
+        process.imageJetsAK8PuppiMD,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
         process.customAK8WithUserData,
