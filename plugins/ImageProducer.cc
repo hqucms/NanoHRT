@@ -24,6 +24,7 @@ struct ImageTFCache {
   }
   //From deepflavour implementation, for consistency 
   std::atomic<tensorflow::GraphDef*> graphDef;
+  std::atomic<tensorflow::GraphDef*> graphDefMD;
 };
 
 class ImageProducer : public edm::stream::EDProducer<edm::GlobalCache<ImageTFCache>> {
@@ -41,11 +42,13 @@ class ImageProducer : public edm::stream::EDProducer<edm::GlobalCache<ImageTFCac
     void produce(edm::Event&, const edm::EventSetup&) override;
     void endStream() override {}
     tensorflow::Session* tfsession_;
+    tensorflow::Session* tfsessionMD_;
 
     const edm::EDGetTokenT<edm::View<pat::Jet>> src_;
     const edm::EDGetTokenT<edm::View<pat::Jet>> sj_;
     std::string sdmcoll_;
     edm::FileInPath pb_path_;
+    edm::FileInPath pb_pathMD_;
     std::string extex_;
 
 };
@@ -53,6 +56,7 @@ class ImageProducer : public edm::stream::EDProducer<edm::GlobalCache<ImageTFCac
 ImageProducer::ImageProducer(const edm::ParameterSet& iConfig,  const ImageTFCache* cache)
 : 
  tfsession_(nullptr)
+, tfsessionMD_(nullptr)
 , src_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("src")))
 , sj_(consumes<edm::View<pat::Jet>>(iConfig.getParameter<edm::InputTag>("sj")))
 , sdmcoll_(iConfig.getParameter<std::string>("sdmcoll"))
@@ -63,11 +67,13 @@ ImageProducer::ImageProducer(const edm::ParameterSet& iConfig,  const ImageTFCac
 
   tensorflow::SessionOptions sessionOptions;
   tfsession_ = tensorflow::createSession(cache->graphDef,sessionOptions);
+  tfsessionMD_ = tensorflow::createSession(cache->graphDefMD,sessionOptions);
   //if(iConfig.getParameter<edm::InputTag>("src").label()=="slimmedJetsAK8")sdmcoll="ak8PFJetsCHSSoftDropMass";
 
 }
 ImageProducer::~ImageProducer(){
  tensorflow::closeSession(tfsession_);
+ tensorflow::closeSession(tfsessionMD_);
 }
 
 void ImageProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions)
@@ -87,6 +93,7 @@ std::unique_ptr<ImageTFCache> ImageProducer::initializeGlobalCache(
   ImageTFCache* cache = new ImageTFCache();
 
   cache->graphDef = tensorflow::loadGraphDef(iConfig.getUntrackedParameter<edm::FileInPath>("pb_path").fullPath());
+  cache->graphDefMD = tensorflow::loadGraphDef(iConfig.getUntrackedParameter<edm::FileInPath>("pb_pathMD").fullPath());
   return std::unique_ptr<ImageTFCache>(cache);
 }
 
@@ -113,6 +120,9 @@ void ImageProducer::globalEndJob(const ImageTFCache* cache)
   if (cache->graphDef != nullptr) {
     delete cache->graphDef;
   }
+  if (cache->graphDefMD != nullptr) {
+    delete cache->graphDefMD;
+  }
 }
 
 void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -129,12 +139,14 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   int jindex=0;
   std::vector<float> itopdisc = {};
+  std::vector<float> itopdiscMD = {};
   int ntopinit = -1;
   //std::cout<<std::endl;
   for (const auto &AK8pfjet : *jets)
 	{
 	ntopinit+=1;
   	itopdisc.push_back(-10.0);
+  	itopdiscMD.push_back(-10.0);
 
         TLorentzVector curtlv;
 	curtlv.SetPtEtaPhiM(AK8pfjet.pt(),AK8pfjet.eta(),AK8pfjet.phi(),AK8pfjet.mass());
@@ -311,7 +323,8 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		}
 
 	//convert scalars to tensorflow
-	std::vector<tensorflow::Tensor> outputs1;
+	std::vector<tensorflow::Tensor> tfoutput;
+	std::vector<tensorflow::Tensor> tfoutputMD;
 	tensorflow::Tensor input_b(tensorflow::DT_FLOAT, { 1, int(sjlist.size()) });
 	float* d = input_b.flat<float>().data();
 	uint index=-1;
@@ -346,9 +359,8 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 				input_map(0,indexedimage[i].first[0], indexedimage[i].first[1], j) = indexedimage[i].second[j];
 			}	
 		}
-
 	//Actually run tensorflow
-  	tensorflow::Status status = tfsession_->Run({ { "input_1", input_image }, {"input_2", input_b} },{ "k2tfout_0" }, {}, &outputs1);
+  	tensorflow::Status status = tfsession_->Run({ { "input_1", input_image }, {"input_2", input_b} },{ "k2tfout_0" }, {}, &tfoutput);
 
 	if (!status.ok()) 
 		{
@@ -356,10 +368,28 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   		std::cout << status.ToString() << "\n";
   		return ;
 		}	
-        float result_top = outputs1[0].flat<float>()(0);
-        float result_qcd = outputs1[0].flat<float>()(1);
+        float result_top = tfoutput[0].flat<float>()(0);
+        float result_qcd = tfoutput[0].flat<float>()(1);
 
 	itopdisc[jindex]=result_top/(result_top+result_qcd);
+
+
+
+  	tensorflow::Status statusMD = tfsessionMD_->Run({ { "input_1", input_image }, {"input_2", input_b} },{ "k2tfout_0" }, {}, &tfoutputMD);
+
+	if (!statusMD.ok()) 
+		{
+		std::cout << "Tensorflow Failed:" << std::endl;
+  		std::cout << status.ToString() << "\n";
+  		return ;
+		}	
+        float result_topMD = tfoutputMD[0].flat<float>()(0);
+        float result_qcdMD = tfoutputMD[0].flat<float>()(1);
+
+	itopdiscMD[jindex]=result_topMD/(result_topMD+result_qcdMD);
+
+
+
 	jindex+=1;
   }
 
@@ -370,6 +400,7 @@ void ImageProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (const auto &jet : *jets){
     pat::Jet newJet(jet);
     newJet.addUserFloat("Image"+extex_+":top", itopdisc[jindex]);
+    newJet.addUserFloat("ImageMD"+extex_+":top", itopdiscMD[jindex]);
     outputs->push_back(newJet);
     jindex+=1;
   }
