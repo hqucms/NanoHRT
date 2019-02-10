@@ -7,7 +7,6 @@ import logging
 
 from CRABAPI.RawCommand import crabCommand
 
-
 def runCrabCommand(command, *args, **kwargs):
     try:
         return crabCommand(command, *args, **kwargs)
@@ -102,7 +101,6 @@ def createConfig(args, dataset):
 
 
 def parseOptions(args):
-
     def convertValue(v):
         if v.lower() == 'true':
             v = True
@@ -309,7 +307,7 @@ def main():
     with open(args.inputfile) as inputfile:
         for l in inputfile:
             l = l.strip()
-            if l.startswith('#'):
+            if not l or l.startswith('#'):
                 continue
             dataset = [s for s in l.split() if '/MINIAOD' in s][0]
             cfg = createConfig(args, dataset)
