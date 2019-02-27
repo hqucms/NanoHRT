@@ -10,6 +10,8 @@ def nanoHRT_customizeCommon(process, runOnMC):
     setupCustomizedAK8(process, runOnMC=runOnMC)
     setupCA15(process, runOnMC=runOnMC)
     setupHOTVR(process, runOnMC=runOnMC)
+    # fix genParticles: keep first gen decay product for all top/W/Z/H
+    process.finalGenParticles.select.append('keep+ (abs(pdgId) == 6 || abs(pdgId) == 23 || abs(pdgId) == 24 || abs(pdgId) == 25)')
     # update MET w/ JEC
     from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
     runMetCorAndUncFromMiniAOD(process, isData=not runOnMC)
