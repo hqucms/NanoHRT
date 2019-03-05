@@ -7,18 +7,6 @@ import logging
 
 from CRABAPI.RawCommand import crabCommand
 
-def runCrabCommand(command, *args, **kwargs):
-    try:
-        return crabCommand(command, *args, **kwargs)
-    except Exception as e:
-        print(getattr(e, 'message', repr(e)))
-
-
-def natural_sort(l):
-    convert = lambda text: int(text) if text.isdigit() else text.lower()
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-    return sorted(l, key=alphanum_key)
-
 
 def configLogger(name, loglevel=logging.INFO):
     # define a Handler which writes INFO messages or higher to the sys.stderr
@@ -29,8 +17,22 @@ def configLogger(name, loglevel=logging.INFO):
     console.setFormatter(logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s'))
     logger.addHandler(console)
 
+
 logger = logging.getLogger(__name__)
 configLogger(__name__)
+
+
+def natural_sort(l):
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
+
+
+def runCrabCommand(command, *args, **kwargs):
+    try:
+        return crabCommand(command, *args, **kwargs)
+    except Exception as e:
+        logger.error(getattr(e, 'message', repr(e)))
 
 
 def parseDatasetName(dataset):
@@ -72,11 +74,15 @@ def createConfig(args, dataset):
     config.JobType.sendExternalFolder = args.send_external
     config.JobType.numCores = args.num_cores
     config.JobType.maxMemoryMB = args.max_memory
+    if args.set_input_dataset:
+        config.JobType.pyCfgParams = ['inputDataset=%s' % dataset]
 
     config.Data.inputDBS = 'global'
     config.Data.inputDataset = dataset
     config.Data.splitting = args.splitting
     config.Data.unitsPerJob = args.units_per_job
+    if args.max_units > 0:
+        config.Data.totalUnits = args.max_units
     if args.no_publication:
         config.Data.publication = False
     config.Data.outputDatasetTag = args.tag + '_' + vername
@@ -101,12 +107,14 @@ def createConfig(args, dataset):
 
 
 def parseOptions(args):
+
     def convertValue(v):
         if v.lower() == 'true':
             v = True
         elif v.lower() == 'false':
             v = False
         return v
+
     options = {}
     if args.options:
         prev = None
@@ -230,6 +238,10 @@ def main():
                         default=300, type=int,
                         help='Units per job. The meaning depends on the splitting. Recommended default numbers: (Automatic: 300 min, LumiBased:100, EventAwareLumiBased:100000) Default: %(default)d'
                         )
+    parser.add_argument('--max-units',
+                        default=-1, type=int,
+                        help='Max units per job. The meaning depends on the splitting. Default: %(default)d'
+                        )
     parser.add_argument('-t', '--tag',
                         default='NanoHRT',
                         help='Output dataset tag. Default: %(default)s'
@@ -249,6 +261,10 @@ def main():
     parser.add_argument('--no-publication',
                         action='store_true', default=False,
                         help='Do not publish the output dataset. Default: %(default)s'
+                        )
+    parser.add_argument('--set-input-dataset',
+                        action='store_true', default=False,
+                        help='Set the inputDataset parameter to the python config file. Default: %(default)s'
                         )
     parser.add_argument('--work-area',
                         default='crab_projects',
