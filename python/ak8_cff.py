@@ -38,7 +38,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process,
         jetSource=cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop'),
         rParam=0.8,
-        jetCorrections=('AK8PFPuppi', cms.vstring(['L2Relative', 'L3Absolute']), 'None'),
+        jetCorrections=('AK8PFPuppi', cms.vstring(JETCorrLevels), 'None'),
         btagDiscriminators=bTagDiscriminators + _pfDeepBoostedJetTagsProbs + _pfMassDecorrelatedDeepBoostedJetTagsProbs,
         postfix='AK8WithPuppiDaughters',
     )
