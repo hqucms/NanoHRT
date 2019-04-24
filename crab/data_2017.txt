@@ -1,0 +1,31 @@
+jetht        jetht-2017b-31mar18          1       /JetHT/Run2017B-31Mar2018-v1/MINIAOD
+jetht        jetht-2017c-31mar18          1       /JetHT/Run2017C-31Mar2018-v1/MINIAOD
+jetht        jetht-2017d-31mar18          1       /JetHT/Run2017D-31Mar2018-v1/MINIAOD
+jetht        jetht-2017e-31mar18          1       /JetHT/Run2017E-31Mar2018-v1/MINIAOD
+jetht        jetht-2017f-31mar18          1       /JetHT/Run2017F-31Mar2018-v1/MINIAOD
+singlemu     singlemu-2017b-31mar18       1       /SingleMuon/Run2017B-31Mar2018-v1/MINIAOD
+singlemu     singlemu-2017c-31mar18       1       /SingleMuon/Run2017C-31Mar2018-v1/MINIAOD
+singlemu     singlemu-2017d-31mar18       1       /SingleMuon/Run2017D-31Mar2018-v1/MINIAOD
+singlemu     singlemu-2017e-31mar18       1       /SingleMuon/Run2017E-31Mar2018-v1/MINIAOD
+singlemu     singlemu-2017f-31mar18       1       /SingleMuon/Run2017F-31Mar2018-v1/MINIAOD
+singlepho    singlepho-2017b-31mar18      1       /SinglePhoton/Run2017B-31Mar2018-v1/MINIAOD
+singlepho    singlepho-2017c-31mar18      1       /SinglePhoton/Run2017C-31Mar2018-v1/MINIAOD
+singlepho    singlepho-2017d-31mar18      1       /SinglePhoton/Run2017D-31Mar2018-v1/MINIAOD
+singlepho    singlepho-2017e-31mar18      1       /SinglePhoton/Run2017E-31Mar2018-v1/MINIAOD
+singlepho    singlepho-2017f-31mar18      1       /SinglePhoton/Run2017F-31Mar2018-v1/MINIAOD
+
+# met        met-2017b-31mar18            1       /MET/Run2017B-31Mar2018-v1/MINIAOD
+# met        met-2017c-31mar18            1       /MET/Run2017C-31Mar2018-v1/MINIAOD
+# met        met-2017d-31mar18            1       /MET/Run2017D-31Mar2018-v1/MINIAOD
+# met        met-2017e-31mar18            1       /MET/Run2017E-31Mar2018-v1/MINIAOD
+# met        met-2017f-31mar18            1       /MET/Run2017F-31Mar2018-v1/MINIAOD
+# singleel   singleel-2017b-31mar18       1       /SingleElectron/Run2017B-31Mar2018-v1/MINIAOD
+# singleel   singleel-2017c-31mar18       1       /SingleElectron/Run2017C-31Mar2018-v1/MINIAOD
+# singleel   singleel-2017d-31mar18       1       /SingleElectron/Run2017D-31Mar2018-v1/MINIAOD
+# singleel   singleel-2017e-31mar18       1       /SingleElectron/Run2017E-31Mar2018-v1/MINIAOD
+# singleel   singleel-2017f-31mar18       1       /SingleElectron/Run2017F-31Mar2018-v1/MINIAOD
+# muoneg     muoneg-2017b-31mar18         1       /MuonEG/Run2017B-31Mar2018-v1/MINIAOD
+# muoneg     muoneg-2017c-31mar18         1       /MuonEG/Run2017C-31Mar2018-v1/MINIAOD
+# muoneg     muoneg-2017d-31mar18         1       /MuonEG/Run2017D-31Mar2018-v1/MINIAOD
+# muoneg     muoneg-2017e-31mar18         1       /MuonEG/Run2017E-31Mar2018-v1/MINIAOD
+# muoneg     muoneg-2017f-31mar18         1       /MuonEG/Run2017F-31Mar2018-v1/MINIAOD

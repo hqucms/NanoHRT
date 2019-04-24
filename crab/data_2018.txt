@@ -1,0 +1,21 @@
+jetht        jetht-2018a-17sep18       1       /JetHT/Run2018A-17Sep2018-v1/MINIAOD
+jetht        jetht-2018b-17sep18       1       /JetHT/Run2018C-17Sep2018-v1/MINIAOD
+jetht        jetht-2018c-17sep18       1       /JetHT/Run2018B-17Sep2018-v1/MINIAOD
+jetht        jetht-2018d-pr-v2         1       /JetHT/Run2018D-PromptReco-v2/MINIAOD
+singlemu     singlemu-2018a-17sep18    1       /SingleMuon/Run2018A-17Sep2018-v2/MINIAOD
+singlemu     singlemu-2018b-17sep18    1       /SingleMuon/Run2018B-17Sep2018-v1/MINIAOD
+singlemu     singlemu-2018c-17sep18    1       /SingleMuon/Run2018C-17Sep2018-v1/MINIAOD
+singlemu     singlemu-2018d-pr-v2      1       /SingleMuon/Run2018D-PromptReco-v2/MINIAOD
+egamma       egamma-2018a-17sep18      1       /EGamma/Run2018A-17Sep2018-v2/MINIAOD
+egamma       egamma-2018b-17sep18      1       /EGamma/Run2018B-17Sep2018-v1/MINIAOD
+egamma       egamma-2018c-17sep18      1       /EGamma/Run2018C-17Sep2018-v1/MINIAOD
+egamma       egamma-2018d-pr-v2        1       /EGamma/Run2018D-PromptReco-v2/MINIAOD
+
+# met          met-2018a-17sep18       1  /MET/Run2018A-17Sep2018-v1/MINIAOD
+# met          met-2018b-17sep18       1  /MET/Run2018B-17Sep2018-v1/MINIAOD
+# met          met-2018c-17sep18       1  /MET/Run2018C-17Sep2018-v1/MINIAOD
+# met          met-2018d-pr-v2         1  /MET/Run2018D-PromptReco-v2/MINIAOD
+# muoneg       muoneg-2018a-17sep18    1  /MuonEG/Run2018A-17Sep2018-v1/MINIAOD
+# muoneg       muoneg-2018b-17sep18    1  /MuonEG/Run2018B-17Sep2018-v1/MINIAOD
+# muoneg       muoneg-2018c-17sep18    1  /MuonEG/Run2018C-17Sep2018-v1/MINIAOD
+# muoneg       muoneg-2018d-pr-v2      1  /MuonEG/Run2018D-PromptReco-v2/MINIAOD
