@@ -8,8 +8,8 @@ from PhysicsTools.NanoHRT.hotvr_cff import setupHOTVR
 def nanoHRT_customizeCommon(process, runOnMC):
     setupCustomizedAK4(process, runOnMC=runOnMC)
     setupCustomizedAK8(process, runOnMC=runOnMC)
-    # setupCA15(process, runOnMC=runOnMC)
-    # setupHOTVR(process, runOnMC=runOnMC)
+    setupCA15(process, runOnMC=runOnMC)
+    setupHOTVR(process, runOnMC=runOnMC)
     # fix genParticles: keep first gen decay product for all top/W/Z/H
     process.finalGenParticles.select.append('keep+ (abs(pdgId) == 6 || abs(pdgId) == 23 || abs(pdgId) == 24 || abs(pdgId) == 25)')
     # update MET w/ JEC

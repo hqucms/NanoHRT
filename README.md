@@ -3,8 +3,8 @@
 ### Set up CMSSW
 
 ```bash
-cmsrel CMSSW_9_4_12
-cd CMSSW_9_4_12/src
+cmsrel CMSSW_10_2_14
+cd CMSSW_10_2_14/src
 cmsenv
 ```
 
@@ -29,10 +29,16 @@ cd PhysicsTools/NanoHRT/test
 
 MC:
 
+For 2016 (80X) sample:
 ```bash
 cmsDriver.py test_nanoHRT_mc -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein /store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root --fileout file:nano_mc.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc.log &
 
 less +F test_mc.log
+```
+
+For 2017 (94X) sample:
+``` bash
+cmsDriver.py test_nanoHRT_mc -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein /store/mc/RunIIFall17MiniAODv2/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v2/70000/66196F80-1659-E811-9076-008CFAEBDC00.root --fileout file:nano_tt1l_2017.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" &> test_mc_2017.log
 ```
 
 Data:

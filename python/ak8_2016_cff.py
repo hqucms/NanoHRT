@@ -67,17 +67,17 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
      )
 
 
-    # process.imageJetsAK8Puppi = cms.EDProducer('ImageProducer',
-    #     src=cms.InputTag('boostedEventShapeJetsAK8Puppi'),
-    #     sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
-    #     sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
-    #     pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_01232018.pb'),
-    #     pb_pathMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_MD_01232018.pb'),
-    #     extex=cms.string('')
-    # )
+    process.imageJetsAK8Puppi = cms.EDProducer('ImageProducer',
+        src=cms.InputTag('boostedEventShapeJetsAK8Puppi'),
+        sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
+        sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
+        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_01232018.pb'),
+        pb_pathMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_MD_01232018.pb'),
+        extex=cms.string('')
+    )
 
     # src
-    srcJets = cms.InputTag('slimmedJetsAK8')
+    srcJets = cms.InputTag('imageJetsAK8Puppi')
 
     # jetID
     process.looseJetIdCustomAK8 = cms.EDProducer("PatJetIDValueMapProducer",
@@ -143,15 +143,15 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                  doc="index of second subjet"),
             nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
             nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
-            # # BEST Tagger
-            # bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
-            # bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
-            # bestZ=Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=-1),
-            # bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1),
-            # bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1),
-            # bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1),
-            # itop=Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1),
-            # iMDtop=Var("userFloat('ImageMD:top')", float, doc="Image tagger score top", precision=-1),
+            # BEST Tagger
+            bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
+            bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
+            bestZ=Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=-1),
+            bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1),
+            bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1),
+            bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1),
+            itop=Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1),
+            iMDtop=Var("userFloat('ImageMD:top')", float, doc="Image tagger score top", precision=-1),
 
         )
     )
@@ -187,8 +187,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8SubJetTable.variables.pt.precision = 10
 
     process.customizedAK8Task = cms.Task(
-        # process.boostedEventShapeJetsAK8Puppi,
-        # process.imageJetsAK8Puppi,
+        process.boostedEventShapeJetsAK8Puppi,
+        process.imageJetsAK8Puppi,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
         process.customAK8WithUserData,
