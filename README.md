@@ -37,7 +37,7 @@ cd PhysicsTools/NanoHRT/test
 MC (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py test_nanoHRT_mc2017 -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein /store/mc/RunIIFall17MiniAODv2/ZprimeToTT_M3000_W30_TuneCP2_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/50000/20FF99D9-702A-E911-B801-0025904CFB86.root --fileout file:nano_mc2017.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc2017.log &
+cmsDriver.py test_nanoHRT_mc2017 -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein /store/mc/RunIIFall17MiniAODv2/ZprimeToTT_M3000_W30_TuneCP2_13TeV-madgraphMLM-pythia8/MINIAODSIM/PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/50000/20FF99D9-702A-E911-B801-0025904CFB86.root --fileout file:nano_mc2017.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc2017.log &
 
 less +F test_mc2017.log
 ```
@@ -45,7 +45,7 @@ less +F test_mc2017.log
 Data (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py test_nanoHRT_data2017 -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeData --filein /store/data/Run2017D/JetHT/MINIAOD/31Mar2018-v1/60000/1EEE02D3-E539-E811-9859-0025905A6066.root --fileout file:nano_data2017.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data2017.log &
+cmsDriver.py test_nanoHRT_data2017 -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein /store/data/Run2017D/JetHT/MINIAOD/31Mar2018-v1/60000/1EEE02D3-E539-E811-9859-0025905A6066.root --fileout file:nano_data2017.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data2017.log &
 
 less +F test_data2017.log
 ```
@@ -54,7 +54,7 @@ less +F test_data2017.log
 MC (2018, 102X):
 
 ```bash
-cmsDriver.py test_nanoHRT_mc2018 -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein /store/mc/RunIIAutumn18MiniAOD/ZprimeToTT_M3000_W30_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/90000/1CFAC15C-895C-CD44-BC86-58EE90CBF456.root --fileout file:nano_mc2018.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc2018.log &
+cmsDriver.py test_nanoHRT_mc2018 -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein /store/mc/RunIIAutumn18MiniAOD/ZprimeToTT_M3000_W30_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/90000/1CFAC15C-895C-CD44-BC86-58EE90CBF456.root --fileout file:nano_mc2018.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc2018.log &
 
 less +F test_mc2018.log
 ```
@@ -62,7 +62,7 @@ less +F test_mc2018.log
 Data (2018, 102X):
 
 ```bash
-cmsDriver.py test_nanoHRT_data2018 -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeData --filein /store/data/Run2018C/JetHT/MINIAOD/17Sep2018-v1/80000/DDC38B74-3A1C-BF4B-9B01-11A3A6A4078A.root --fileout file:nano_data2018.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data2018.log &
+cmsDriver.py test_nanoHRT_data2018 -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein /store/data/Run2018C/JetHT/MINIAOD/17Sep2018-v1/80000/DDC38B74-3A1C-BF4B-9B01-11A3A6A4078A.root --fileout file:nano_data2018.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data2018.log &
 
 less +F test_data2018.log
 ```
@@ -85,20 +85,20 @@ source /cvmfs/cms.cern.ch/crab3/crab.sh
 MC (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py test_nanoHRT_mc2017 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py test_nanoHRT_mc2017 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 Data (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py data_2017 -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2017 -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 
 MC (2018, 102X):
 
 ```bash
-cmsDriver.py mc_2018 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py mc_2018 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable)' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 Data (2018, 102X):
@@ -108,13 +108,13 @@ Data (2018, 102X):
 For 2018ABC:
 
 ```bash
-cmsDriver.py data_2018ABC -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2018ABC -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 For 2018D:
 
 ```bash
-cmsDriver.py data_2018D -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Prompt_v13 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoTuples_cff.nanoTuples_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2018D -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Prompt_v13 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 **Step 2**: use the `crab.py` script to submit the CRAB jobs:
