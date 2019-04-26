@@ -5,7 +5,7 @@ from Configuration.Eras.Modifier_run2_miniAOD_80XLegacy_cff import run2_miniAOD_
 # ---------------------------------------------------------
 
 
-def setupCustomizedAK8(process, runOnMC=False, path=None):
+def setupCustomizedAK8(process, runOnMC=False, runBEST=False, runImageTop=False, path=None):
     # recluster Puppi jets, add N-Subjettiness and ECF
     bTagDiscriminators = [
         'pfCombinedInclusiveSecondaryVertexV2BJetTags',
@@ -42,42 +42,42 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         btagDiscriminators=bTagDiscriminators + _pfDeepBoostedJetTagsProbs + _pfMassDecorrelatedDeepBoostedJetTagsProbs,
         postfix='AK8WithPuppiDaughters',
     )
+    srcJets = cms.InputTag('selectedUpdatedPatJetsAK8WithPuppiDaughters')
 
     # BEST
-    process.boostedEventShapeJetsAK8Puppi = cms.EDProducer('BESTProducer',
-        src=cms.InputTag('selectedUpdatedPatJetsAK8WithPuppiDaughters'),
-        config_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/config.txt'),
-        dnn_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/BEST_6bin_CHS.json'),
-    )
+    if runBEST:
+        process.boostedEventShapeJetsAK8Puppi = cms.EDProducer('BESTProducer',
+            src=srcJets,
+            config_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/config.txt'),
+            dnn_path=cms.FileInPath('PhysicsTools/NanoHRT/data/BEST/BEST_6bin_CHS.json'),
+        )
+        srcJets = cms.InputTag('boostedEventShapeJetsAK8Puppi')
 
+    if runImageTop:
+        from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 
-    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+        Bdiscs = ['pfDeepFlavourJetTags:probb', 'pfDeepFlavourJetTags:probbb', 'pfDeepFlavourJetTags:probuds', 'pfDeepFlavourJetTags:probg' , 'pfDeepFlavourJetTags:problepb', 'pfDeepFlavourJetTags:probc', 'pfCombinedInclusiveSecondaryVertexV2BJetTags']
+        updateJetCollection(
+            process,
+            labelName='UpdatebtagAK8PFPuppiSoftDropSubjets',
+            jetSource=cms.InputTag('selectedPatJetsAK8PFPuppiSoftDropSubjets'),
+            jetCorrections=('AK4PFchs', cms.vstring([]), 'None'),
+            pvSource=cms.InputTag("offlineSlimmedPrimaryVertices"),
+            svSource=cms.InputTag('slimmedSecondaryVertices'),
+            muSource=cms.InputTag('slimmedMuons'),
+            elSource=cms.InputTag('slimmedElectrons'),
+            btagDiscriminators=Bdiscs
+        )
 
-    Bdiscs = ['pfDeepFlavourJetTags:probb', 'pfDeepFlavourJetTags:probbb', 'pfDeepFlavourJetTags:probuds', 'pfDeepFlavourJetTags:probg' , 'pfDeepFlavourJetTags:problepb', 'pfDeepFlavourJetTags:probc','pfCombinedInclusiveSecondaryVertexV2BJetTags']
-    updateJetCollection(
-     process,
-     labelName = 'UpdatebtagAK8PFPuppiSoftDropSubjets',
-     jetSource = cms.InputTag('selectedPatJetsAK8PFPuppiSoftDropSubjets'),
-     jetCorrections = ('AK4PFchs', cms.vstring([]), 'None'),
-     pvSource = cms.InputTag("offlineSlimmedPrimaryVertices"),
-     svSource = cms.InputTag('slimmedSecondaryVertices'),
-     muSource = cms.InputTag('slimmedMuons'),
-     elSource = cms.InputTag('slimmedElectrons'),
-     btagDiscriminators = Bdiscs
-     )
-
-
-    process.imageJetsAK8Puppi = cms.EDProducer('ImageProducer',
-        src=cms.InputTag('boostedEventShapeJetsAK8Puppi'),
-        sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
-        sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
-        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_01232018.pb'),
-        pb_pathMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_MD_01232018.pb'),
-        extex=cms.string('')
-    )
-
-    # src
-    srcJets = cms.InputTag('imageJetsAK8Puppi')
+        process.imageJetsAK8Puppi = cms.EDProducer('ImageProducer',
+            src=srcJets,
+            sj=cms.InputTag('selectedUpdatedPatJetsUpdatebtagAK8PFPuppiSoftDropSubjets'),
+            sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
+            pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_01232018.pb'),
+            pb_pathMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/NNtraining_preliminary_MD_01232018.pb'),
+            extex=cms.string('')
+        )
+        srcJets = cms.InputTag('imageJetsAK8Puppi')
 
     # jetID
     process.looseJetIdCustomAK8 = cms.EDProducer("PatJetIDValueMapProducer",
@@ -143,16 +143,6 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                  doc="index of second subjet"),
             nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
             nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
-            # BEST Tagger
-            bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
-            bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
-            bestZ=Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=-1),
-            bestH=Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1),
-            bestQCD=Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1),
-            bestB=Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1),
-            itop=Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1),
-            iMDtop=Var("userFloat('ImageMD:top')", float, doc="Image tagger score top", precision=-1),
-
         )
     )
     run2_miniAOD_80XLegacy.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
@@ -167,6 +157,18 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     for prob in _pfMassDecorrelatedDeepBoostedJetTagsProbs:
         name = prob.split(':')[1].replace('prob', 'nnMD')
         setattr(process.customAK8Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
+
+    if runBEST:
+        process.customAK8Table.variables.bestT = Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1)
+        process.customAK8Table.variables.bestW = Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1)
+        process.customAK8Table.variables.bestZ = Var("userFloat('BEST:dnn_z')", float, doc="Boosted Event Shape Tagger score Z", precision=-1)
+        process.customAK8Table.variables.bestH = Var("userFloat('BEST:dnn_higgs')", float, doc="Boosted Event Shape Tagger score Higgs", precision=-1)
+        process.customAK8Table.variables.bestQCD = Var("userFloat('BEST:dnn_qcd')", float, doc="Boosted Event Shape Tagger score QCD", precision=-1)
+        process.customAK8Table.variables.bestB = Var("userFloat('BEST:dnn_b')", float, doc="Boosted Event Shape Tagger score B", precision=-1)
+
+    if runImageTop:
+        process.customAK8Table.variables.itop = Var("userFloat('Image:top')", float, doc="Image tagger score top", precision=-1)
+        process.customAK8Table.variables.iMDtop = Var("userFloat('ImageMD:top')", float, doc="Image tagger score top", precision=-1)
 
     process.customAK8SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropPacked", "SubJets"),
@@ -187,14 +189,16 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8SubJetTable.variables.pt.precision = 10
 
     process.customizedAK8Task = cms.Task(
-        process.boostedEventShapeJetsAK8Puppi,
-        process.imageJetsAK8Puppi,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable
         )
+    if runBEST:
+        process.customizedAK8Task.add(process.boostedEventShapeJetsAK8Puppi)
+    if runImageTop:
+        process.customizedAK8Task.add(process.imageJetsAK8Puppi)
 
     if runOnMC:
         process.customGenJetAK8Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
