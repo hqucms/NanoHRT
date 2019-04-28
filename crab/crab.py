@@ -2,6 +2,8 @@
 from __future__ import print_function
 
 import argparse
+import subprocess
+import os
 import re
 import logging
 
@@ -103,7 +105,15 @@ def createConfig(args, dataset):
         config.Site.whitelist = ['T3_US_FNALLPC']
         config.Site.ignoreGlobalBlacklist = True
 
-    return config
+    # write config file
+    cfgdir = os.path.join(args.work_area, 'configs')
+    if not os.path.exists(cfgdir):
+        os.makedirs(cfgdir)
+    cfgpath = os.path.join(cfgdir, config.General.requestName + '.py')
+    with open(cfgpath, 'w') as f:
+        f.write(str(config))
+
+    return config, cfgpath
 
 
 def parseOptions(args):
@@ -320,19 +330,28 @@ def main():
         killjobs(args)
         return
 
+    submit_failed = []
     with open(args.inputfile) as inputfile:
         for l in inputfile:
             l = l.strip()
             if not l or l.startswith('#'):
                 continue
             dataset = [s for s in l.split() if '/MINIAOD' in s][0]
-            cfg = createConfig(args, dataset)
+            cfg, cfgpath = createConfig(args, dataset)
             if args.dryrun:
                 print('-' * 50)
                 print(cfg)
                 continue
             logger.info('Submitting dataset %s' % dataset)
-            runCrabCommand('submit', config=cfg)
+            cmd = 'crab submit -c {cfgpath}'.format(cfgpath=cfgpath)
+            p = subprocess.Popen(cmd, shell=True)
+            p.communicate()
+            if p.returncode != 0:
+                submit_failed.append(cfgpath)
+#             runCrabCommand('submit', config=cfg)
+
+    if len(submit_failed):
+        logger.warning('Submit failed:\n%s' % '\n'.join(submit_failed))
 
 
 if __name__ == '__main__':
