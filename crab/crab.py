@@ -190,7 +190,7 @@ def _analyze_crab_status(ret):
 def status(args):
     import os
     kwargs = parseOptions(args)
-    jobnames = os.listdir(args.work_area)
+    jobnames = [d for d in os.listdir(args.work_area) if d.startswith('crab_')]
     finished = 0
     job_status = {}
     submit_failed = []
