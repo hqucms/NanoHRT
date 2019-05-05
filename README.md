@@ -85,20 +85,20 @@ source /cvmfs/cms.cern.ch/crab3/crab.sh
 MC (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py test_nanoHRT_mc2017 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable);process.add_(cms.Service('InitRootHandlers', EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py test_nanoHRT_mc2017 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_mc2017_realistic_v6 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable);process.add_(cms.Service("InitRootHandlers", EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 Data (2017, 94X, MiniAODv2):
 
 ```bash
-cmsDriver.py data_2017 -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service('InitRootHandlers', EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2017 -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v8 --step NANO --nThreads 4 --era Run2_2017,run2_nanoAOD_94XMiniAODv2 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service("InitRootHandlers", EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 
 MC (2018, 102X):
 
 ```bash
-cmsDriver.py mc_2018 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable);process.add_(cms.Service('InitRootHandlers', EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py mc_2018 -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v18 --step NANO --nThreads 4 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --customise_commands 'process.particleLevelSequence.remove(process.genParticles2HepMCHiggsVtx);process.particleLevelSequence.remove(process.rivetProducerHTXS);process.particleLevelTables.remove(process.HTXSCategoryTable);process.add_(cms.Service("InitRootHandlers", EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 Data (2018, 102X):
@@ -108,13 +108,13 @@ Data (2018, 102X):
 For 2018ABC:
 
 ```bash
-cmsDriver.py data_2018ABC -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service('InitRootHandlers', EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2018ABC -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Sep2018ABC_v2 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service("InitRootHandlers", EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 For 2018D:
 
 ```bash
-cmsDriver.py data_2018D -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Prompt_v13 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service('InitRootHandlers', EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data_2018D -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_Prompt_v13 --step NANO --nThreads 4 --era Run2_2018 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --customise_commands 'process.add_(cms.Service("InitRootHandlers", EnableIMT=cms.untracked.bool(False)))' --filein file:step-1.root --fileout file:nano.root --no_exec
 ```
 
 **Step 2**: use the `crab.py` script to submit the CRAB jobs:
