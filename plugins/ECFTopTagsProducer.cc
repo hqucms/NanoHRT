@@ -190,7 +190,9 @@ void ECFTopTagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
     ClusterSequenceArea seq(vjet, *jetDef, *areaDef);
     auto alljets(sorted_by_pt(seq.inclusive_jets(0.1)));
     if (alljets.size() == 0) {
-      newJet.addUserFloat("ecf_0", -1);
+      for (unsigned i=0; i<ecfs.size(); ++i){
+        newJet.addUserFloat("ecf_"+std::to_string(i), -1);
+      }
       newJet.addUserFloat("httMass", -1);
       newJet.addUserFloat("httFRec", -1);
       newJet.addUserFloat("tau32sd", -1);
@@ -234,7 +236,9 @@ void ECFTopTagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       htt_frec = 0;
     }
 
-    newJet.addUserFloat("ecf_0", ecfs[0]);
+    for (unsigned i=0; i<ecfs.size(); ++i){
+      newJet.addUserFloat("ecf_"+std::to_string(i), ecfs[i]);
+    }
     newJet.addUserFloat("httMass", htt_mass);
     newJet.addUserFloat("httFRec", htt_frec);
     newJet.addUserFloat("tau32sd", tau32sd);

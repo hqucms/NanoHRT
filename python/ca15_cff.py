@@ -96,7 +96,7 @@ def setupCA15(process, runOnMC=False, path=None):
                  doc="index of first subjet"),
             subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int,
                  doc="index of second subjet"),
-            ecf0=Var("userFloat('ecf_0')", float, doc="ecfN_1_2_20/pow(ecfN_1_2_10,2.00)", precision=10),
+            nDaughters=Var("numberOfDaughters()", int, doc="number of daughter particles"),
             httFRec=Var("userFloat('httFRec')", float, doc="HTT frec", precision=10),
             tau32sd=Var("userFloat('tau32sd')", float, doc="soft drop tau32", precision=10),
             ecfTopTagBDT=Var("userFloat('ecfTopTagBDT')", float, doc="ECF top BDT", precision=10),
@@ -104,6 +104,9 @@ def setupCA15(process, runOnMC=False, path=None):
     )
     run2_miniAOD_80XLegacy.toModify(process.ca15Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
     process.ca15Table.variables.pt.precision = 10
+    for i in range(11):
+        name = 'ecf_%d' % i
+        setattr(process.ca15Table.variables, name, Var("userFloat('%s')" % name, float, doc=name, precision=10))
 
     process.ca15SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsCA15PFPuppiSoftDropPacked", "SubJets"),

@@ -143,6 +143,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                  doc="index of second subjet"),
             nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
             nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
+            nDaughters=Var("numberOfDaughters()", int, doc="number of daughter particles"),
             # BEST Tagger
             bestT=Var("userFloat('BEST:dnn_top')", float, doc="Boosted Event Shape Tagger score Top", precision=-1),
             bestW=Var("userFloat('BEST:dnn_w')", float, doc="Boosted Event Shape Tagger score W", precision=-1),
