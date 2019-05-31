@@ -232,3 +232,82 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.schedule.associate(process.customizedAK8Task)
     else:
         getattr(process, path).associate(process.customizedAK8Task)
+
+
+def setupExtraDeepAK8(process, runOnMC=False, path=None):
+    from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    from RecoBTag.MXNet.pfDeepBoostedJet_cff import _pfDeepBoostedJetTagsProbs
+    JETCorrLevels = ['L2Relative', 'L3Absolute', 'L2L3Residual']
+
+    # Kin-only version
+    updateJetCollection(
+        process,
+        jetSource=cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop'),
+        rParam=0.8,
+        jetCorrections=('AK8PFPuppi', cms.vstring(JETCorrLevels), 'None'),
+        btagDiscriminators=_pfDeepBoostedJetTagsProbs,
+        postfix='AK8WithPuppiDaughtersDeepAK8Kin',
+    )
+    from PhysicsTools.NanoHRT.pfDeepBoostedJetPreprocessParamsKin_cfi import pfDeepBoostedJetPreprocessParams as paramsKin
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8Kin.preprocessParams = paramsKin
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8Kin.model_path = 'PhysicsTools/NanoHRT/data/DeepBoostedJet/ak8/kin/resnet-symbol.json'
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8Kin.param_path = 'PhysicsTools/NanoHRT/data/DeepBoostedJet/ak8/kin/resnet-0000.params'
+
+    process.deepAK8KinTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
+        src=cms.InputTag("selectedUpdatedPatJetsAK8WithPuppiDaughtersDeepAK8Kin"),
+        name=cms.string("DeepAK8Kin"),
+        cut=cms.string(""),
+        doc=cms.string("DeepAK8, Kin"),
+        singleton=cms.bool(False),  # the number of entries is variable
+        extension=cms.bool(False),  # this is the main table for the jets
+        variables=cms.PSet(P4Vars,
+            msoftdrop=Var("groomedMass()", float, doc="Corrected soft drop mass with PUPPI", precision=10),
+            subJetIdx1=Var("?nSubjetCollections()>0 && subjets().size()>0?subjets()[0].key():-1", int, doc="index of first subjet"),
+            subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int, doc="index of second subjet"),
+        )
+    )
+    process.deepAK8KinTable.variables.pt.precision = 10
+
+    # add DeepAK8 scores: nominal
+    for prob in _pfDeepBoostedJetTagsProbs:
+        name = prob.split(':')[1].replace('prob', 'nn')
+        setattr(process.deepAK8KinTable.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
+
+    # NoFlv version
+    updateJetCollection(
+        process,
+        jetSource=cms.InputTag('packedPatJetsAK8PFPuppiSoftDrop'),
+        rParam=0.8,
+        jetCorrections=('AK8PFPuppi', cms.vstring(JETCorrLevels), 'None'),
+        btagDiscriminators=_pfDeepBoostedJetTagsProbs,
+        postfix='AK8WithPuppiDaughtersDeepAK8NoFlv',
+    )
+    from PhysicsTools.NanoHRT.pfDeepBoostedJetPreprocessParamsNoFlv_cfi import pfDeepBoostedJetPreprocessParams as paramsNoFlv
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8NoFlv.preprocessParams = paramsNoFlv
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8NoFlv.model_path = 'PhysicsTools/NanoHRT/data/DeepBoostedJet/ak8/noFlv/resnet-symbol.json'
+    process.pfDeepBoostedJetTagsAK8WithPuppiDaughtersDeepAK8NoFlv.param_path = 'PhysicsTools/NanoHRT/data/DeepBoostedJet/ak8/noFlv/resnet-0000.params'
+
+    process.deepAK8NoFlvTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
+        src=cms.InputTag("selectedUpdatedPatJetsAK8WithPuppiDaughtersDeepAK8NoFlv"),
+        name=cms.string("DeepAK8NoFlv"),
+        cut=cms.string(""),
+        doc=cms.string("DeepAK8, NoFlv"),
+        singleton=cms.bool(False),  # the number of entries is variable
+        extension=cms.bool(False),  # this is the main table for the jets
+        variables=cms.PSet(P4Vars,
+            msoftdrop=Var("groomedMass()", float, doc="Corrected soft drop mass with PUPPI", precision=10),
+            subJetIdx1=Var("?nSubjetCollections()>0 && subjets().size()>0?subjets()[0].key():-1", int, doc="index of first subjet"),
+            subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int, doc="index of second subjet"),
+        )
+    )
+    process.deepAK8NoFlvTable.variables.pt.precision = 10
+
+    # add DeepAK8 scores: nominal
+    for prob in _pfDeepBoostedJetTagsProbs:
+        name = prob.split(':')[1].replace('prob', 'nn')
+        setattr(process.deepAK8NoFlvTable.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
+
+    process.customizedAK8Task.add(
+        process.deepAK8KinTable,
+        process.deepAK8NoFlvTable
+        )
