@@ -13,11 +13,11 @@ https://github.com/knash/NanoHRT/blob/ForTraining/
 cmsrel CMSSW_10_2_15
 cd CMSSW_10_2_15/src
 cmsenv
-#git-cms-addpkg PhysicsTools/NanoAOD (may not be necessary)
-#git-cms-addpkg PhysicsTools/SelectorUtils (may not be necessary)
+git-cms-addpkg PhysicsTools/NanoAOD 
+git-cms-addpkg PhysicsTools/SelectorUtils 
 ```
 
-### Get Recipes
+### Get Recipes - I don't think these are necessary yet
 * MET: EE noise mitigation: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_9_or_10
 * Electrons/Photons: Egamma ID for 2017+2016: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
 	* 949 -> if you want the V2 IDs, otherwise skip
@@ -37,7 +37,7 @@ cp L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root L1Prefiring/Ev
 ### Get customized NanoAOD producer
 
 ```bash
-git clone https://github.com/DAZSLE/NanoHRT.git PhysicsTools/NanoHRT
+git clone https://github.com/cmantill/NanoHRT.git PhysicsTools/NanoHRT
 ```
 
 ### Compile
