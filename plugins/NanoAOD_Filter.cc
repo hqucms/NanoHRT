@@ -54,16 +54,16 @@ bool NanoAOD_Filter::filter( edm::Event& iEvent, const edm::EventSetup& iSetup) 
   edm::Handle<edm::View<pat::Jet>> jetsAK4;
   iEvent.getByToken(srcAK4_, jetsAK4);
 
-  //This section selects HT>800
+  //This section selects HT>400 = pretty loose
   float totht=0.0;
   for (const auto &AK4pfjet : *jetsAK4)
 	{
 	if (AK4pfjet.pt()>30.0) totht+=AK4pfjet.pt();
 	//std::cout<<"AK4,ht "<<AK4pfjet.pt()<<" "<<totht<<std::endl;
 	}
-  if(totht<800.0) return 0;
+  if(totht<400.0) return 0;
 
-  //This section selects at least two AK8 jets w/pt > 200
+  //This section selects at least one AK8 jets w/pt > 200
   //std::cout<<"NAK "<<jetsAK8->size()<<std::endl;
   //if (jetsAK8->size()>1)
 	//{	
