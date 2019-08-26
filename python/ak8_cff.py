@@ -146,13 +146,12 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             n2b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN2')", float, doc="N2 with beta=1", precision=10),
             n3b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN3')", float, doc="N3 with beta=1", precision=10),
             msoftdrop=Var("groomedMass()", float, doc="Corrected soft drop mass with PUPPI", precision=10),
-            btagDeepB = Var("bDiscriminator('pfDeepCSVJetTags:probb')+bDiscriminator('pfDeepCSVJetTags:probbb')",float,doc="DeepCSV b+bb tag discriminator",precision=10),
-            btagCSVV2=Var("bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')", float, doc=" pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)", precision=10),
-            btagHbb=Var("bDiscriminator('pfBoostedDoubleSecondaryVertexAK8BJetTags')", float, doc="Higgs to BB tagger discriminator", precision=10),
+            #btagDeepB = Var("bDiscriminator('pfDeepCSVJetTags:probb')+bDiscriminator('pfDeepCSVJetTags:probbb')",float,doc="DeepCSV b+bb tag discriminator",precision=10),
+            #btagCSVV2=Var("bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')", float, doc=" pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)", precision=10),
+            btagHbb=Var("bDiscriminator('pfBoostedDoubleSecondaryVertexAK8BJetTags')", float, doc="old Higgs to BB tagger discriminator", precision=10),
             btagDDBvL = Var("bDiscriminator('pfMassIndependentDeepDoubleBvLJetTags:probHbb')",float,doc="DeepDoubleX (mass-decorrelated) discriminator for H(Z)->bb vs QCD",precision=10),
             btagDDCvL = Var("bDiscriminator('pfMassIndependentDeepDoubleCvLJetTags:probHcc')",float,doc="DeepDoubleX (mass-decorrelated) discriminator for H(Z)->cc vs QCD",precision=10),
             btagDDCvB = Var("bDiscriminator('pfMassIndependentDeepDoubleCvBJetTags:probHcc')",float,doc="DeepDoubleX (mass-decorrelated) discriminator for H(Z)->cc vs H(Z)->bb",precision=10),
-
             subJetIdx1=Var("?nSubjetCollections()>0 && subjets().size()>0?subjets()[0].key():-1", int,
                  doc="index of first subjet"),
             subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int,
@@ -174,14 +173,18 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     run2_miniAOD_80XLegacy.toModify(process.customAK8Table.variables, jetId=Var("userInt('tightId')*2+userInt('looseId')", int, doc="Jet ID flags bit1 is loose, bit2 is tight"))
     process.customAK8Table.variables.pt.precision = 10
 
+    _pfDeepBoostedJetTagsProbs_new = ['pfDeepBoostedJetTags:probWcq','pfDeepBoostedJetTags:probWqq', 'pfDeepBoostedJetTags:probZbb', 'pfDeepBoostedJetTags:probZcc', 'pfDeepBoostedJetTags:probZqq', 'pfDeepBoostedJetTags:probHbb','pfDeepBoostedJetTags:probHcc', 'pfDeepBoostedJetTags:probHqqqq', 'pfDeepBoostedJetTags:probQCDbb', 'pfDeepBoostedJetTags:probQCDcc']
+
+    _pfMassDecorrelatedDeepBoostedJetTagsProbs_new = ['pfMassDecorrelatedDeepBoostedJetTags:probWcq', 'pfMassDecorrelatedDeepBoostedJetTags:probWqq', 'pfMassDecorrelatedDeepBoostedJetTags:probZbb', 'pfMassDecorrelatedDeepBoostedJetTags:probZcc', 'pfMassDecorrelatedDeepBoostedJetTags:probZqq', 'pfMassDecorrelatedDeepBoostedJetTags:probHbb', 'pfMassDecorrelatedDeepBoostedJetTags:probHcc', 'pfMassDecorrelatedDeepBoostedJetTags:probHqqqq', 'pfMassDecorrelatedDeepBoostedJetTags:probQCDbb', 'pfMassDecorrelatedDeepBoostedJetTags:probQCDcc']
+
     # add DeepAK8 scores: nominal
-    for prob in _pfDeepBoostedJetTagsProbs:
-        name = prob.split(':')[1].replace('prob', 'nn')
+    for prob in _pfDeepBoostedJetTagsProbs_new:
+        name = prob.split(':')[1].replace('prob', 'deepTag')
         setattr(process.customAK8Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
 
     # add DeepAK8 scores: mass decorrelated
-    for prob in _pfMassDecorrelatedDeepBoostedJetTagsProbs:
-        name = prob.split(':')[1].replace('prob', 'nnMD')
+    for prob in _pfMassDecorrelatedDeepBoostedJetTagsProbs_new:
+        name = prob.split(':')[1].replace('prob', 'deepTagMD')
         setattr(process.customAK8Table.variables, name, Var("bDiscriminator('%s')" % prob, float, doc=prob, precision=-1))
 
     process.customAK8SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
@@ -218,13 +221,14 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                                                         variables = cms.PSet(CandVars,
                                                                              puppiWeight = Var("puppiWeight()", float, doc="Puppi weight",precision=10),
                                                                              puppiWeightNoLep = Var("puppiWeightNoLep()", float, doc="Puppi weight removing leptons",precision=10),
-                                                                             vtxChi2 = Var("hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2",precision=10),
-                                                                             trkChi2 = Var("hasTrackDetails()?pseudoTrack().normalizedChi2():-1", float, doc="normalized trk chi2", precision=10),
-                                                                             dz = Var("hasTrackDetails()?dz():-1", float, doc="pf dz",precision=10),
-                                                                             d0 = Var("hasTrackDetails()?dxy():-1", float, doc="pf d0",precision=10),
-                                                                             d0Err = Var("hasTrackDetails()?dxyError():-1", float, doc="pf d0 err",precision=10),
+                                                                             vtxChi2 = Var("?hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2",precision=10),
+                                                                             trkChi2 = Var("?hasTrackDetails()?pseudoTrack().normalizedChi2():-1", float, doc="normalized trk chi2", precision=10),
+                                                                             dz = Var("?hasTrackDetails()?dz():-1", float, doc="pf dz",precision=10),
+                                                                             d0 = Var("?hasTrackDetails()?dxy():-1", float, doc="pf d0",precision=10),
+                                                                             d0Err = Var("?hasTrackDetails()?dxyError():-1", float, doc="pf d0 err",precision=10),
                                                                              )
                                                         )
+
     process.customizedAK8Task = cms.Task(
         process.imageJetsAK8Puppi,
         process.tightJetIdCustomAK8,
@@ -232,8 +236,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable,
-        process.customAK8Constituents,
-        process.customAK8ConstituentsTable,
+       # process.customAK8Constituents,
+       # process.customAK8ConstituentsTable,
         )
 
     if runOnMC:
@@ -245,7 +249,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             singleton=cms.bool(False),  # the number of entries is variable
             extension=cms.bool(False),  # this is the main table for the genjets
             variables=cms.PSet(P4Vars,
-            )
+                               #msoftdrop = Var("groomedMass('SoftDropPuppi')",float, doc="Corrected soft drop mass with PUPPI",precision=10), #wishlist
+                               )
         )
         process.customGenJetAK8Table.variables.pt.precision = 10
 
@@ -274,15 +279,15 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                                                               doc = cms.string("interesting gen particles from AK8 jets"),
                                                               singleton = cms.bool(False), # the number of entries is variable
                                                               extension = cms.bool(False), # this is the main table for the AK8 constituents
-                                                              variables = cms.PSet(CandVars
+                                                              variables = cms.PSet(CandVars,
                                                                                    )
                                                               )
 
-        process.customizedAK8Task.add(process.customGenJetAK8Table)
-        process.customizedAK8Task.add(process.customGenSubJetAK8Table)
+        #process.customizedAK8Task.add(process.customGenJetAK8Table)
+        #process.customizedAK8Task.add(process.customGenSubJetAK8Table)
 
-        process.customizedAK8Task.add(process.customGenJetAK8Constituents)
-        process.customizedAK8Task.add(process.customGenJetAK8ParticleTable)
+        #process.customizedAK8Task.add(process.customGenJetAK8Constituents)
+        #process.customizedAK8Task.add(process.customGenJetAK8ParticleTable)
 
     _customizedAK8Task_80X = process.customizedAK8Task.copy()
     _customizedAK8Task_80X.replace(process.tightJetIdLepVetoCustomAK8, process.looseJetIdCustomAK8)
