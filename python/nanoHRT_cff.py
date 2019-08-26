@@ -1,10 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoHRT.ak8_cff import setupCustomizedAK8
-from PhysicsTools.NanoHRT.ca15_cff import setupCA15
 
 def nanoHRT_customizeCommon(process, runOnMC):
     setupCustomizedAK8(process, runOnMC=runOnMC)
-    setupCA15(process, runOnMC=runOnMC)
     # fix genParticles: keep first gen decay product for all top/W/Z/H
     process.finalGenParticles.select.append('keep+ (abs(pdgId) == 6 || abs(pdgId) == 23 || abs(pdgId) == 24 || abs(pdgId) == 25)')
     # update MET w/ JEC
