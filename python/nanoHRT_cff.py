@@ -8,6 +8,9 @@ def nanoHRT_customizeCommon(process, runOnMC):
     # update MET w/ JEC
     from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
     runMetCorAndUncFromMiniAOD(process, isData=not runOnMC)
+    # remove regular fat jets
+    process.jetTables.remove(process.fatJetTable)
+    process.jetTables.remove(process.subJetTable)
     return process
 
 
