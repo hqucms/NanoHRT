@@ -1,17 +1,43 @@
-# NanoHRT
+# DASZLE NanoHRT
+
+Based on:
+
+https://github.com/cms-jet/NanoAODJMAR
+https://github.com/hqucms/NanoHRT
+https://github.com/knash/NanoHRT/blob/ForTraining/
+======
 
 ### Set up CMSSW
 
 ```bash
-cmsrel CMSSW_9_4_12
-cd CMSSW_9_4_12/src
+cmsrel CMSSW_10_2_15
+cd CMSSW_10_2_15/src
 cmsenv
+git-cms-addpkg PhysicsTools/NanoAOD 
+git-cms-addpkg PhysicsTools/SelectorUtils 
 ```
 
-### Get customized NanoAOD producers for HeavyResTagging
+### Get Recipes - I don't think these are necessary yet
+* MET: EE noise mitigation: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_9_or_10
+* Electrons/Photons: Egamma ID for 2017+2016: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
+	* 949 -> if you want the V2 IDs, otherwise skip
+	* 940 -> just adds in an extra file to have a setup function to make things easier
+* L1-ECAL prefiring: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe  
 
 ```bash
-git clone https://github.com/hqucms/NanoHRT.git PhysicsTools/NanoHRT
+git cms-merge-topic cms-met:METFixEE2017_949_v2_backport_to_102X (or git cms-merge-topic cms-met:METFixEE2017_949_v2 if 9X)
+git cms-merge-topic cms-egamma:EgammaID_949
+git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
+git cms-merge-topic lathomas:L1Prefiring_9_4_9
+cp AnalysisTreeMaker/patch/L1ECALPrefiringWeightProducer.cc L1Prefiring/EventWeightProducer/plugins/
+mkdir L1Prefiring/EventWeightProducer/data
+cp L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root L1Prefiring/EventWeightProducer/data/
+```
+
+### Get customized NanoAOD producer
+
+```bash
+git clone https://github.com/cmantill/NanoHRT.git PhysicsTools/NanoHRT
 ```
 
 ### Compile

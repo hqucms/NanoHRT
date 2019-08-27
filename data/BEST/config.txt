@@ -1,9 +1,0 @@
-dnnFile BEST_6bin_CHS.json
-applyKinematicCuts true
-radiusSmall 0.4
-radiusLarge 0.8
-reclusterJetPtMin 20.0
-jetSoftDropMassMin 40.0
-jetPtMin 500.0
-numSubjetsMin 2
-numDaughtersMin 2
