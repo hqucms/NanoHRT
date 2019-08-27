@@ -14,6 +14,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         'pfBoostedDoubleSecondaryVertexAK8BJetTags',
         'pfMassIndependentDeepDoubleBvLJetTags:probHbb',
         'pfMassIndependentDeepDoubleCvLJetTags:probHcc',
+        'pfMassIndependentDeepDoubleCvBJetTags:probHcc',
     ]
     subjetBTagDiscriminators = [
         'pfCombinedInclusiveSecondaryVertexV2BJetTags',
@@ -156,6 +157,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                  doc="index of first subjet"),
             subJetIdx2=Var("?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].key():-1", int,
                  doc="index of second subjet"),
+            nPFConstituents=Var("numberOfDaughters()", int, doc="Number of PF daughter constituents"),
             nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
             nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
             iW=Var("userFloat('Image:w')", float, doc="Image w tagger score", precision=-1),
@@ -208,7 +210,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8Constituents = cms.EDProducer("PatJetConstituentPtrSelector",
                                                    #src = cms.InputTag("updatedJetsAK8"),
                                                    src = cms.InputTag("customAK8WithUserData"),
-                                                   cut = cms.string("pt > 170.0")
+                                                   cut = cms.string("")
                                                    )
 
     process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
@@ -236,8 +238,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable,
-       # process.customAK8Constituents,
-       # process.customAK8ConstituentsTable,
+        process.customAK8Constituents,
+        process.customAK8ConstituentsTable,
         )
 
     if runOnMC:
