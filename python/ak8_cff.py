@@ -116,13 +116,23 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     run2_nanoAOD_102Xv1.toModify( process.tightJetIdCustomAK8.filterParams, version = "SUMMER18PUPPI" )
     run2_nanoAOD_102Xv1.toModify( process.tightJetIdLepVetoCustomAK8.filterParams, version = "SUMMER18PUPPI" )
 
+    process.lepInJetVars = cms.EDProducer("LepInJetProducer",
+                                          src = srcJets,
+                                          srcEle = cms.InputTag("slimmedElectrons"),
+                                          srcMu = cms.InputTag("slimmedMuons")
+                                          )
+
     process.customAK8WithUserData = cms.EDProducer("PATJetUserDataEmbedder",
-        src=srcJets,
-        userFloats=cms.PSet(),
-        userInts=cms.PSet(
-           tightId=cms.InputTag("tightJetIdCustomAK8"),
-           tightIdLepVeto=cms.InputTag("tightJetIdLepVetoCustomAK8"),
-        ),
+                                                   src=srcJets,
+                                                   userFloats = cms.PSet(lsf3 = cms.InputTag("lepInJetVars:lsf3"),
+                                                                         dRLep = cms.InputTag("lepInJetVars:dRLep"),
+                                                                         ),
+                                                   userInts = cms.PSet(tightId = cms.InputTag("tightJetIdCustomAK8"),
+                                                                       tightIdLepVeto = cms.InputTag("tightJetIdLepVetoCustomAK8"),
+                                                                       muonIdx3SJ = cms.InputTag("lepInJetVars:muIdx3SJ"),
+                                                                       electronIdx3SJ = cms.InputTag("lepInJetVars:eleIdx3SJ"),
+                                                                       idLep = cms.InputTag("lepInJetVars:idLep"),
+                                                                       ),
     )
     run2_miniAOD_80XLegacy.toModify(process.customAK8WithUserData.userInts,
         looseId=cms.InputTag("looseJetIdCustomAK8"),
@@ -167,6 +177,11 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             iMDHWW=Var("userFloat('ImageMD:hww')", float, doc="Image MD h->ww->qqqq tagger score", precision=-1),
             iMDHWWlep=Var("userFloat('ImageMD:hwwlep')", float, doc="Image MD h->ww->lnuqq tagger score", precision=-1),
             itopmass=Var("userFloat('Image:mass')", float, doc="Image tagger groomed mass", precision=-1),
+            lsf3 = Var("userFloat('lsf3')",float, doc="LSF (3 subjets)",precision=10),
+            dRLep = Var("userFloat('dRLep')", float, doc="dR(lep,jet)",precision=10),
+            muonIdx3SJ = Var("userInt('muonIdx3SJ')",int, doc="index of muon matched (3 subjets)"),
+            electronIdx3SJ = Var("userInt('electronIdx3SJ')",int,doc="index of electron matched (3 subjets)"),
+            idLep =  Var("userInt('idLep')", int, doc="id of pf particle matched to that reco electron or muon"),
         )
     )
 
@@ -235,6 +250,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.imageJetsAK8Puppi,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
+        process.lepInJetVars,
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable,
