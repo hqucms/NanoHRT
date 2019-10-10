@@ -141,7 +141,7 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       int ele_pfmatch_index(-1),mu_pfmatch_index(-1);
       float lepPt(-1),lepEta(-1),lepPhi(-1); 
       int lepId(-1); // save the id of the pf part matched for now
-      float dRmin(0.8),dRtmp(999.),ptmin(0),dRLep(-1);
+      float dRmin(0.8),dRtmp(999.),ptmin(10),dRLep(-1); //ptmin of lepton is 10 GeV
 
       leptonInJet(itJet, srcEle, dRtmp, ptmin, ele_pfmatch_index, lepId, dRmin);
       if(ele_pfmatch_index!=-1) {
