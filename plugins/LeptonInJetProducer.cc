@@ -128,7 +128,14 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     // Find leptons in jets
     for (unsigned int ij = 0; ij<srcJet->size(); ij++){
       const pat::Jet &itJet = (*srcJet)[ij];
-      if(itJet.pt() <= 10) continue;
+      if(itJet.pt() <= 10){
+        vlsf3->push_back( -1);
+        vdRLep->push_back( -1);
+	veleIdx3SJ->push_back( -1);
+        vmuIdx3SJ->push_back( -1);
+	vidLep->push_back( -1);
+        continue;
+      }
 
       // take the jet constituents as the particles to compute the lsf
       std::vector<fastjet::PseudoJet> lClusterParticles;
