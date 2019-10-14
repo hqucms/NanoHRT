@@ -128,6 +128,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             n2b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN2')", float, doc="N2 with beta=1", precision=10),
             n3b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN3')", float, doc="N3 with beta=1", precision=10),
             msoftdrop=Var("groomedMass()", float, doc="Corrected soft drop mass with PUPPI", precision=10),
+            msoftdrop_raw=Var("userFloat('ak8PFJetsPuppiSoftDropMass')", float, doc="Raw soft drop mass with PUPPI", precision=10),
             #btagDeepB = Var("bDiscriminator('pfDeepCSVJetTags:probb')+bDiscriminator('pfDeepCSVJetTags:probbb')",float,doc="DeepCSV b+bb tag discriminator",precision=10),
             #btagCSVV2=Var("bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')", float, doc=" pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)", precision=10),
             btagHbb=Var("bDiscriminator('pfBoostedDoubleSecondaryVertexAK8BJetTags')", float, doc="old Higgs to BB tagger discriminator", precision=10),
@@ -273,6 +274,12 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     _customizedAK8Task_80X = process.customizedAK8Task.copy()
     _customizedAK8Task_80X.replace(process.tightJetIdLepVetoCustomAK8, process.looseJetIdCustomAK8)
     run2_miniAOD_80XLegacy.toReplaceWith(process.customizedAK8Task, _customizedAK8Task_80X)
+
+    # Bacon 15 config, deprecated
+    # process.pfInclusiveSecondaryVertexFinderAK8TagInfosAK8PFPuppiAK8WithPuppiDaughters.extSVDeltaRToJet = cms.double(0.3)
+    # process.pfInclusiveSecondaryVertexFinderAK8TagInfosAK8PFPuppiAK8WithPuppiDaughters.trackSelection.jetDeltaRMax = cms.double(0.3)
+    # process.pfInclusiveSecondaryVertexFinderAK8TagInfosAK8PFPuppiAK8WithPuppiDaughters.vertexCuts.maxDeltaRToJetAxis = cms.double(0.4)
+    # process.pfImpactParameterAK8TagInfosAK8PFPuppiAK8WithPuppiDaughters.computeProbabilities = cms.bool(True)
 
     if path is None:
         process.schedule.associate(process.customizedAK8Task)
