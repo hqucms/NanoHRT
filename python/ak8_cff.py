@@ -52,37 +52,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 		updateCollectionSubjets='selectedPatJetsAK8PFPuppiSoftDropPacked:SubJets', subjetBTagDiscriminators=Bdiscs, 
 		subJETCorrPayload='AK4PFPuppi', subJETCorrLevels=JETCorrLevels,postFix='AK8WithPuppiDaughters')
 
-    process.imageJetsAK8Puppi = cms.EDProducer('ImageProducer',
-        src=cms.InputTag('selectedUpdatedPatJetsAK8PFPuppiAK8WithPuppiDaughters'),
-        sj=cms.InputTag('selectedUpdatedPatJetsAK8PFPuppiAK8WithPuppiDaughtersSoftDropPacked'),
-        sdmcoll=cms.string('ak8PFJetsPuppiSoftDropMass'),
-        pb_path=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/top_MC_output.pb'),
-        pb_pathMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/top_MD_output.pb'),
-        pb_pathPhoflessMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/pho_MD_flavorless_output.pb'),
-        pb_pathPhoMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/pho_nolep_MD_doubleB_output.pb'),
-        pb_pathW=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/w_MC_output.pb'),
-        pb_pathWMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/w_MD_output.pb'),
-        pb_pathH=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hbb_nolep_MC_doubleB_output.pb'),
-        pb_pathHMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hbb_nolep_MD_doubleB_output.pb'),
-        pb_pathHflessMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hbb_MD_flavorless_output.pb'),
-        pb_pathZ=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/z_nolep_MC_doubleB_output.pb'),
-        pb_pathZflessMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/z_MD_flavorless_output.pb'),
-        pb_pathZMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/z_nolep_MD_doubleB_output.pb'),
-        pb_pathWWMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/ww_MD_output.pb'),
-        pb_pathWWlepMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/wwlep_MD_output.pb'),
-        pb_pathHWWMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hww_MD_output.pb'),
-        pb_pathHWWlepMD=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hwwlep_MD_output.pb'),
-        pb_pathMDHOT=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/top_MD_HOT_output.pb'),
-        pb_pathWWlepMDHOT=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/wwlep_MD_HOT_output.pb'),
-        pb_pathWWMDHOT=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/ww_MD_HOT_output.pb'),
-        pb_pathHWWlepMDHOT=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hwwlep_MD_HOT_output.pb'),
-        pb_pathHWWMDHOT=cms.untracked.FileInPath('PhysicsTools/NanoHRT/data/Image/hww_MD_HOT_output.pb'),
-        extex=cms.string(''),
-        isHotVR=cms.bool(False),
-    )                           
-
     # src
-    srcJets = cms.InputTag('imageJetsAK8Puppi')
+    srcJets = cms.InputTag('selectedUpdatedPatJetsAK8PFPuppiAK8WithPuppiDaughters')
 
     # jetID
     process.looseJetIdCustomAK8 = cms.EDProducer("PatJetIDValueMapProducer",
@@ -170,13 +141,6 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             nPFConstituents=Var("numberOfDaughters()", int, doc="Number of PF daughter constituents"),
             nBHadrons=Var("jetFlavourInfo().getbHadrons().size()", int, doc="number of b-hadrons"),
             nCHadrons=Var("jetFlavourInfo().getcHadrons().size()", int, doc="number of c-hadrons"),
-            iW=Var("userFloat('Image:w')", float, doc="Image w tagger score", precision=-1),
-            iMDW=Var("userFloat('ImageMD:w')", float, doc="Image MD w tagger score", precision=-1),
-            iMDH=Var("userFloat('ImageMD:h')", float, doc="Image MD h tagger score", precision=-1),
-            iMDHfless=Var("userFloat('ImageMD:hfless')", float, doc="Image MD h tagger score (without b tagging)", precision=-1),
-            iMDHWW=Var("userFloat('ImageMD:hww')", float, doc="Image MD h->ww->qqqq tagger score", precision=-1),
-            iMDHWWlep=Var("userFloat('ImageMD:hwwlep')", float, doc="Image MD h->ww->lnuqq tagger score", precision=-1),
-            itopmass=Var("userFloat('Image:mass')", float, doc="Image tagger groomed mass", precision=-1),
             lsf3 = Var("userFloat('lsf3')",float, doc="LSF (3 subjets)",precision=10),
             dRLep = Var("userFloat('dRLep')", float, doc="dR(lep,jet)",precision=10),
             muonIdx3SJ = Var("userInt('muonIdx3SJ')",int, doc="index of muon matched (3 subjets)"),
@@ -247,7 +211,6 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                                                         )
 
     process.customizedAK8Task = cms.Task(
-        process.imageJetsAK8Puppi,
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
         process.lepInJetVars,
