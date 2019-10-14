@@ -1,11 +1,4 @@
-# DASZLE NanoHRT
-
-Based on:
-
-https://github.com/cms-jet/NanoAODJMAR
-https://github.com/hqucms/NanoHRT
-https://github.com/knash/NanoHRT/blob/ForTraining/
-======
+# DASZLE Pancakes
 
 ### Set up CMSSW
 
@@ -17,33 +10,16 @@ git-cms-addpkg PhysicsTools/NanoAOD
 git-cms-addpkg PhysicsTools/SelectorUtils 
 ```
 
-### Get Recipes - I don't think these are necessary yet
-* MET: EE noise mitigation: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETUncertaintyPrescription#Instructions_for_9_4_X_X_9_or_10
-* Electrons/Photons: Egamma ID for 2017+2016: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPostRecoRecipes
-	* 949 -> if you want the V2 IDs, otherwise skip
-	* 940 -> just adds in an extra file to have a setup function to make things easier
-* L1-ECAL prefiring: https://twiki.cern.ch/twiki/bin/viewauth/CMS/L1ECALPrefiringWeightRecipe  
-
-```bash
-git cms-merge-topic cms-met:METFixEE2017_949_v2_backport_to_102X (or git cms-merge-topic cms-met:METFixEE2017_949_v2 if 9X)
-git cms-merge-topic cms-egamma:EgammaID_949
-git cms-merge-topic cms-egamma:EgammaPostRecoTools_940
-git cms-merge-topic lathomas:L1Prefiring_9_4_9
-cp AnalysisTreeMaker/patch/L1ECALPrefiringWeightProducer.cc L1Prefiring/EventWeightProducer/plugins/
-mkdir L1Prefiring/EventWeightProducer/data
-cp L1Prefiring/EventWeightProducer/files/L1PrefiringMaps_new.root L1Prefiring/EventWeightProducer/data/
-```
-
 ### Get customized NanoAOD producer
 
 ```bash
-git clone https://github.com/cmantill/NanoHRT.git PhysicsTools/NanoHRT
+git clone https://github.com/DAZSLE/NanoHRT.git PhysicsTools/NanoHRT
 ```
 
 ### Compile
 
 ```bash
-scram b -j16
+scram b -j 16
 ```
 
 ### Test
@@ -55,26 +31,28 @@ cd PhysicsTools/NanoHRT/test
 
 MC:
 
-```bash
-cmsDriver.py test_nanoHRT_mc -n 1000 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein /store/mc/RunIISummer16MiniAODv2/ZprimeToTT_M-3000_W-30_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/80000/D6D620EF-73BE-E611-8BFB-B499BAA67780.root --fileout file:nano_mc.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_mc.log &
+2018: 102X_upgrade2018_realistic_v19
 
-less +F test_mc.log
+ex. file: /store/mc/RunIIAutumn18MiniAOD/BulkGravTohhTohWWhbb_narrow_M-2300_TuneCP2_13TeV-madgraph_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/260000/24516D8A-B053-1A42-A10F-07EA8D96FE6C.root
+```bash
+cmsDriver.py test_nanoHRT_mc --filein /store/mc/RunIIAutumn18MiniAOD/BulkGravTohhTohWWhbb_narrow_M-2300_TuneCP2_13TeV-madgraph_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/260000/24516D8A-B053-1A42-A10F-07EA8D96FE6C.root --fileout file:RunIIAutumn18NanoAODv5_BulkGravTohhTohWWhbb.root --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --python_filename RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC -n 10 --no_exec 
 ```
 
 Data:
 
+2018: 102X_dataRun2_v11
+
+ex. file: /store/data/Run2018B/JetHT/MINIAOD/17Sep2018-v1/60000/FE3C69F0-A0BC-8941-92AF-B0DA1A6270BF.root
 ```bash
-cmsDriver.py test_nanoHRT_data -n 1000 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 94X_dataRun2_v4 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData_METMuEGClean --filein /store/data/Run2016G/JetHT/MINIAOD/03Feb2017-v1/100000/006E7AF2-AEEC-E611-A88D-7845C4FC3B00.root --fileout file:nano_data.root --customise_commands "process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))" >& test_data.log &
-
-less +F test_data.log
+cmsDriver.py test_nanoHRT_data --filein /store/data/Run2018B/JetHT/MINIAOD/17Sep2018-v1/60000/FE3C69F0-A0BC-8941-92AF-B0DA1A6270BF.root --fileout file:RunIIAutumn18NanoAODv5_JetHTRun2018B.root --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --eventcontent NANOAOD --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --python_filename=RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py -s NANO --no_exec 
 ```
-
 
 ### Production
 
 **Step 0**: switch to the crab production directory and set up grid proxy, CRAB environment, etc.
 
 ```bash
+mkdir $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
 cd $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
 # set up grid proxy
 voms-proxy-init -rfc -voms cms --valid 168:00
@@ -84,27 +62,28 @@ source /cvmfs/cms.cern.ch/crab3/crab.sh
 
 **Step 1**: generate the python config file with `cmsDriver.py` with the following commands:
 
-MC (80X, MiniAODv2):
+MC (102X, MiniAODv2):
 
 ```bash
-cmsDriver.py mc -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 94X_mcRun2_asymptotic_v2 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py mc -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py --no_exec
 ```
 
-Data (`23Sep2016` ReReco):
+Data (`2018` PromptReco-17Jul2018):
 
 ```bash
-cmsDriver.py data -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 94X_dataRun2_v4 --step NANO --nThreads 4 --era Run2_2016,run2_miniAOD_80XLegacy --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData_METMuEGClean --filein file:step-1.root --fileout file:nano.root --no_exec
+cmsDriver.py data -n -1 --data --eventcontent NANOEDMAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py --no_exec
 ```
 
-**Step 2**: use the `crab.py` script to submit the CRAB jobs:
+**Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test), e.g.:
 
-For MC:
+version = 01
 
-`python crab.py -p mc_NANO.py -o /store/group/lpcjme/noreplica/NanoHRT/mc/[version] -t NanoTuples-[version] -i mc_[ABC].txt --num-cores 4 --send-external -s EventAwareLumiBased -n 50000 --work-area crab_projects_mc_[ABC] --dryrun`
+For MC (2018):
+`python crab.py -p RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py -o /store/group/[group]/[username]/pancakes/[version]/ -t pancakes-[version] -i signal_2018.txt --num-cores 2 --send-external -s EventAwareLumiBased -n 50000 --work-area crab_projects_mc_2018 --max-memory 5000 --dryrun`
 
-For data:
+For data (2018):
 
-`python crab.py -p data_NANO.py -o /store/group/lpcjme/noreplica/NanoHRT/data/[version] -t NanoTuples-[version] -i data.txt --num-cores 4 --send-external -s EventAwareLumiBased -n 50000 --work-area crab_projects_data --dryrun`
+`python crab.py -p RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py  -o /store/group/[group]/[username]/pancakes/[version] -t pancakes-[version] -i data_2018.txt --num-cores 2 --send-external -s EventAwareLumiBased -n 200000 --work-area crab_projects_data_2018 --max-memory 5000 --json https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt --dryrun`
 
 A JSON file can be applied for data samples with the `-j` options. By default, we use the golden JSON for 2016:
 
@@ -114,21 +93,5 @@ https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions
 
 These command will perform a "dryrun" to print out the CRAB configuration files. Please check everything is correct (e.g., the output path, version number, requested number of cores, etc.) before submitting the actual jobs. To actually submit the jobs to CRAB, just remove the `--dryrun` option at the end.
 
-**Step 3**: check job status
-
-The status of the CRAB jobs can be checked with:
-
-```bash
-./crab.py --status --work-area crab_projects_[ABC]
-```
-
-Note that this will also resubmit failed jobs automatically.
-
-The crab dashboard can also be used to get a quick overview of the job status:
-`https://dashb-cms-job.cern.ch/dashboard/templates/task-analysis`
-
-More options of this `crab.py` script can be found with:
-
-```bash
-./crab.py -h
-```
+To check status
+`https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view`
