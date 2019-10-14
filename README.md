@@ -60,7 +60,7 @@ voms-proxy-init -rfc -voms cms --valid 168:00
 source /cvmfs/cms.cern.ch/crab3/crab.sh
 ```
 
-**Step 1**: generate the python config file with `cmsDriver.py` with the following commands:
+**Step 1**: generate the python config file with `cmsDriver.py` with the following commands - these are included for now:
 
 MC (102X, MiniAODv2):
 
@@ -71,10 +71,10 @@ cmsDriver.py mc -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --con
 Data (`2018` PromptReco-17Jul2018):
 
 ```bash
-cmsDriver.py data -n -1 --data --eventcontent NANOEDMAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py --no_exec
+cmsDriver.py data -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py --no_exec
 ```
 
-**Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test), e.g.:
+**Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test), e.g.: 
 
 version = 01
 
