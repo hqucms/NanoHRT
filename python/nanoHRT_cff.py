@@ -1,5 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 from PhysicsTools.NanoHRT.ak8_cff import setupCustomizedAK8
+from PhysicsTools.NanoAOD.common_cff import Var
 
 def nanoHRT_customizeCommon(process, runOnMC):
     setupCustomizedAK8(process, runOnMC=runOnMC)
@@ -11,6 +12,9 @@ def nanoHRT_customizeCommon(process, runOnMC):
     # remove regular fat jets
     process.jetTables.remove(process.fatJetTable)
     process.jetTables.remove(process.subJetTable)
+    # don't drop bacon loose taus, but keep the other (era-dependent?) selection as well
+    baconcut = "pt > 18 && tauID('decayModeFinding') && (tauID('byCombinedIsolationDeltaBetaCorrRaw3Hits') < 5)"
+    process.finalTaus.cut = cms.string("(%s) || (%s)" % (baconcut, process.finalTaus.cut.value()))
     return process
 
 
