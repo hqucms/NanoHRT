@@ -55,3 +55,37 @@ def nanoHRT_customizeMC(process):
     process = nanoHRT_customizeCommon(process, True)
     process.NANOAODSIMoutput.fakeNameForCrab = cms.untracked.bool(True)  # needed for crab publication
     return process
+
+def nanoHRT_customizeMINLOnnlops(process):
+    wnames = [
+        "nnlops-11-1",
+        "nnlops-11-2",
+        "nnlops-11-3",
+        "nnlops-11-4",
+        "nnlops-11-5",
+        "nnlops-11-6",
+        "nnlops-11-7",
+        "nnlops-11-8",
+        "nnlops-11-9",
+        "nnlops-22-1",
+        "nnlops-22-2",
+        "nnlops-22-3",
+        "nnlops-22-4",
+        "nnlops-22-5",
+        "nnlops-22-6",
+        "nnlops-22-7",
+        "nnlops-22-8",
+        "nnlops-22-9",
+        "nnlops-0505-1",
+        "nnlops-0505-2",
+        "nnlops-0505-3",
+        "nnlops-0505-4",
+        "nnlops-0505-5",
+        "nnlops-0505-6",
+        "nnlops-0505-7",
+        "nnlops-0505-8",
+        "nnlops-0505-9",
+    ]
+    process.genWeightsTable.namedWeightIDs = cms.vstring(wnames)
+    process.genWeightsTable.namedWeightLabels = cms.vstring(wnames)
+    return process
