@@ -88,6 +88,7 @@ public:
     produces<edm::ValueMap<int>>("muIdx3SJ");
     produces<edm::ValueMap<int>>("eleIdx3SJ");
     produces<edm::ValueMap<int>>("idLep");
+    produces<std::vector<edm::Ptr<pat::PackedCandidate>>>("pfCandsNoLep");
   }
   ~LeptonInJetProducer() override {};
   
@@ -119,11 +120,12 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     edm::Handle<edm::View<pat::Muon>> srcMu;
     iEvent.getByToken(srcMu_, srcMu);
 
-    std::vector<float> *vlsf3 = new std::vector<float>;
-    std::vector<float> *vdRLep = new std::vector<float>;
-    std::vector<int> *vmuIdx3SJ = new std::vector<int>;
-    std::vector<int> *veleIdx3SJ = new std::vector<int>;
-    std::vector<int> *vidLep = new std::vector<int>;
+    std::unique_ptr<std::vector<float>> vlsf3(new std::vector<float>);
+    std::unique_ptr<std::vector<float>> vdRLep(new std::vector<float>);
+    std::unique_ptr<std::vector<int>> vmuIdx3SJ(new std::vector<int>);
+    std::unique_ptr<std::vector<int>> veleIdx3SJ(new std::vector<int>);
+    std::unique_ptr<std::vector<int>> vidLep(new std::vector<int>);
+    std::unique_ptr<std::vector<edm::Ptr<pat::PackedCandidate>>> pfCandsNoLep(new std::vector<edm::Ptr<pat::PackedCandidate>>);
 
     // Find leptons in jets
     for (unsigned int ij = 0; ij<srcJet->size(); ij++){
@@ -170,6 +172,17 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       veleIdx3SJ->push_back( ele_pfmatch_index );
       vmuIdx3SJ->push_back( mu_pfmatch_index );
       vidLep->push_back( lepId );
+
+      // Try removing matched lepton (if any) from PF constituents
+      if ( mu_pfmatch_index != -1 or ele_pfmatch_index != -1 ) {
+        for ( const auto& pfPart : itJet.daughterPtrVector() ) {
+          if ( reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) < 0.01 and std::abs(pfPart->pdgId()) == lepId )
+          {
+            continue;
+          }
+          pfCandsNoLep->push_back(edm::Ptr<pat::PackedCandidate>(pfPart));
+        }
+      }
     }
 
 
@@ -203,6 +216,8 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     filleridLep.insert(srcJet,vidLep->begin(),vidLep->end());
     filleridLep.fill();
     iEvent.put(std::move(idLepV),"idLep");
+
+    iEvent.put(std::move(pfCandsNoLep), "pfCandsNoLep");
 }
 
 template <typename T>

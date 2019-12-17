@@ -202,14 +202,16 @@ def jetToolbox( proc, jetType, jetSequence, outputFile,
 				if verbosity>=1: print('|---- jetToolBox: Not running puppi algorithm because keyword puppi was specified in nameNewPFCollection, but applying puppi corrections.')
 			else: 
 				proc.load('CommonTools.PileupAlgos.Puppi_cff')
-				puppi.candName = cms.InputTag( pfCand ) 
+				thispuppi = puppi.clone()
+				thispuppi.candName = cms.InputTag( pfCand ) 
 				if miniAOD:
-				  puppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
-				  puppi.clonePackedCands = cms.bool(True)
-				  puppi.useExistingWeights = cms.bool(True)
-				_addProcessAndTask(proc, 'puppi', getattr(proc, 'puppi'))
-				jetSeq += getattr(proc, 'puppi' )
-				srcForPFJets = 'puppi'
+					thispuppi.vertexName = cms.InputTag('offlineSlimmedPrimaryVertices')
+					thispuppi.clonePackedCands = cms.bool(True)
+					thispuppi.useExistingWeights = cms.bool(True)
+				puppiname = pfCand.replace(':', '') + 'puppi'
+				_addProcessAndTask(proc, puppiname, thispuppi)
+				jetSeq += getattr(proc, puppiname)
+				srcForPFJets = puppiname
 
 			from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi
 			mod["PFJets"] = jetalgo+'PFJetsPuppi'+postFix
@@ -1100,3 +1102,4 @@ def _addProcessAndTask(proc, label, module):
 	from PhysicsTools.PatAlgos.tools.helpers import getPatAlgosToolsTask, addToProcessAndTask
 	task = getPatAlgosToolsTask(proc)
 	addToProcessAndTask(label, module, proc, task)
+# vim: set ts=4 sw=4 tw=0 noet :
