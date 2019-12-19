@@ -174,9 +174,9 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       vidLep->push_back( lepId );
 
       // Try removing matched lepton (if any) from PF constituents
-      if ( mu_pfmatch_index != -1 or ele_pfmatch_index != -1 ) {
+      if ( (mu_pfmatch_index != -1) or (ele_pfmatch_index != -1) ) {
         for ( const auto& pfPart : itJet.daughterPtrVector() ) {
-          if ( reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) < 0.01 and std::abs(pfPart->pdgId()) == lepId )
+          if ( (reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) < 0.01) and (std::abs(pfPart->pdgId()) == lepId) )
           {
             continue;
           }
