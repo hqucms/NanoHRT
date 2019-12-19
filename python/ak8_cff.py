@@ -145,7 +145,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 
     process.customAK8Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("customAK8WithUserData"),
-        name=cms.string("CustomAK8Puppi"),
+        name=cms.string("FatJet"),
         cut=cms.string(""),
         doc=cms.string("customized ak8 puppi jets for HRT"),
         singleton=cms.bool(False),  # the number of entries is variable
@@ -215,7 +215,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropPacked", "SubJets"),
         cut=cms.string(""),
-        name=cms.string("CustomAK8PuppiSubJet"),
+        name=cms.string("SubJet"),
         doc=cms.string("customized ak8 puppi subjets for HRT"),
         singleton=cms.bool(False),  # the number of entries is variable
         extension=cms.bool(False),  # this is the main table for the jets
