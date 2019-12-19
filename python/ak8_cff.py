@@ -239,7 +239,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
                                                         src = cms.InputTag("customAK8Constituents", "constituents"),
                                                         cut = cms.string(""), #we should not filter after pruning
-                                                        name= cms.string("PFCandsAK8"),
+                                                        name= cms.string("FatJetPFCands"),
                                                         doc = cms.string("interesting particles from AK8 jets"),
                                                         singleton = cms.bool(False), # the number of entries is variable
                                                         extension = cms.bool(False), # this is the main table for the AK8 constituents
