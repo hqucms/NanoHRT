@@ -89,8 +89,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 
     process.lepInJetVars = cms.EDProducer("LepInJetProducer",
                                           src = srcJets,
-                                          srcEle = cms.InputTag("slimmedElectrons"),
-                                          srcMu = cms.InputTag("slimmedMuons")
+                                          srcEle = cms.InputTag("finalElectrons"),
+                                          srcMu = cms.InputTag("finalMuons")
                                           )
 
     jetToolbox(process, 'ak8', 'leptonSubtractedJetSeq', '', associateTask=False,
