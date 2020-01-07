@@ -38,12 +38,17 @@ void leptonInJet(const pat::Jet &jet, const C1 & leptons, float &lepdR, float &l
   for(unsigned ilep(0); ilep < leptons->size(); ilep++){
     auto itLep = leptons->ptrAt(ilep);
     float dR = reco::deltaR(jet.eta(), jet.phi(), itLep->eta(), itLep->phi());
+    if(!itLep->pfCandidateRef().isNonnull()) continue;
     if( dR < tmpdR && dR < jetdR && itLep->pt() > tmpPt) {
       tmpdR = dR;
       tmpIndex = ilep;
       tmpPt = itLep->pt();
-      if(itLep->isMuon()) tmpId = 13;
-      if(itLep->isElectron()) tmpId = 11;
+      if(itLep->isMuon()){
+	tmpId = 13;
+      }
+      if(itLep->isElectron()) {
+	tmpId = 11;
+      }
       break;
     }
   } // loop over leptons
@@ -156,12 +161,20 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       if(ele_pfmatch_index!=-1) {
         auto itLep = srcEle->ptrAt(ele_pfmatch_index);
 	lepPt = itLep->pt(); lepEta = itLep->eta(); lepPhi = itLep->phi(); lepId = 11;
+        if(!itLep->pfCandidateRef().isNonnull()){
+	  std::cout << " is not pFElectron " << std::endl;
+	  ele_pfmatch_index = -1;
+	}
       }
 
       leptonInJet(itJet, srcMu, dRtmp, ptmin, mu_pfmatch_index, lepId, dRmin);
       if(mu_pfmatch_index!=-1) {
         auto itLep = srcMu->ptrAt(mu_pfmatch_index);
 	lepPt =itLep->pt(); lepEta = itLep->eta(); lepPhi = itLep->phi(); lepId = 13;
+        if(!itLep->isPFMuon()){
+	  std::cout << " is not pFMuon " << std::endl;
+	  mu_pfmatch_index = -1;
+	}
       }
 
       std::vector<fastjet::PseudoJet> psub_3;
@@ -175,13 +188,28 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
 
       // Try removing matched lepton (if any) from PF constituents
       if ( mu_pfmatch_index != -1 or ele_pfmatch_index != -1 ) {
+	bool found = false;
         for ( const auto& pfPart : itJet.daughterPtrVector() ) {
           if ( reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) < 0.01 and std::abs(pfPart->pdgId()) == lepId )
-          {
-            continue;
-          }
+	    {
+	      found = true;
+	      continue;
+	    }
           pfCandsNoLep->push_back(edm::Ptr<pat::PackedCandidate>(pfPart));
         }
+	if ( found == false ) {
+	  std::cout << "failed to find particle associated to mu" << mu_pfmatch_index << "/ele" << ele_pfmatch_index << " at " << lepEta << ", " << lepPhi << ", " << lepId << std::endl;
+	  bool lepfound = false;
+	  for ( const auto& pfPart : itJet.daughterPtrVector() ) {
+	    if ( (std::abs(pfPart->pdgId()) == 11) or (std::abs(pfPart->pdgId()) == 13) ) {
+	      lepfound = true;
+	      std::cout << "    " << pfPart->eta() << ", " << pfPart->phi() << ", " << pfPart->pdgId() << " dR=" << reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) << std::endl;
+	    }
+	  }
+	  if ( lepfound == false ) { 
+	    std::cout << " no lepton in candidates " << std::endl;
+	  }
+	}
       }
     }
 
