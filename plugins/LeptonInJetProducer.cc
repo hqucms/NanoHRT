@@ -38,12 +38,17 @@ void leptonInJet(const pat::Jet &jet, const C1 & leptons, float &lepdR, float &l
   for(unsigned ilep(0); ilep < leptons->size(); ilep++){
     auto itLep = leptons->ptrAt(ilep);
     float dR = reco::deltaR(jet.eta(), jet.phi(), itLep->eta(), itLep->phi());
+    if(!itLep->pfCandidateRef().isNonnull()) continue;
     if( dR < tmpdR && dR < jetdR && itLep->pt() > tmpPt) {
       tmpdR = dR;
       tmpIndex = ilep;
       tmpPt = itLep->pt();
-      if(itLep->isMuon()) tmpId = 13;
-      if(itLep->isElectron()) tmpId = 11;
+      if(itLep->isMuon()){
+	tmpId = 13;
+      }
+      if(itLep->isElectron()) {
+	tmpId = 11;
+      }
       break;
     }
   } // loop over leptons
@@ -88,6 +93,7 @@ public:
     produces<edm::ValueMap<int>>("muIdx3SJ");
     produces<edm::ValueMap<int>>("eleIdx3SJ");
     produces<edm::ValueMap<int>>("idLep");
+    produces<std::vector<edm::Ptr<pat::PackedCandidate>>>("pfCandsNoLep");
   }
   ~LeptonInJetProducer() override {};
   
@@ -119,11 +125,12 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     edm::Handle<edm::View<pat::Muon>> srcMu;
     iEvent.getByToken(srcMu_, srcMu);
 
-    std::vector<float> *vlsf3 = new std::vector<float>;
-    std::vector<float> *vdRLep = new std::vector<float>;
-    std::vector<int> *vmuIdx3SJ = new std::vector<int>;
-    std::vector<int> *veleIdx3SJ = new std::vector<int>;
-    std::vector<int> *vidLep = new std::vector<int>;
+    std::unique_ptr<std::vector<float>> vlsf3(new std::vector<float>);
+    std::unique_ptr<std::vector<float>> vdRLep(new std::vector<float>);
+    std::unique_ptr<std::vector<int>> vmuIdx3SJ(new std::vector<int>);
+    std::unique_ptr<std::vector<int>> veleIdx3SJ(new std::vector<int>);
+    std::unique_ptr<std::vector<int>> vidLep(new std::vector<int>);
+    std::unique_ptr<std::vector<edm::Ptr<pat::PackedCandidate>>> pfCandsNoLep(new std::vector<edm::Ptr<pat::PackedCandidate>>);
 
     // Find leptons in jets
     for (unsigned int ij = 0; ij<srcJet->size(); ij++){
@@ -154,12 +161,20 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       if(ele_pfmatch_index!=-1) {
         auto itLep = srcEle->ptrAt(ele_pfmatch_index);
 	lepPt = itLep->pt(); lepEta = itLep->eta(); lepPhi = itLep->phi(); lepId = 11;
+        if(!itLep->pfCandidateRef().isNonnull()){
+	  std::cout << " is not pFElectron " << std::endl;
+	  ele_pfmatch_index = -1;
+	}
       }
 
       leptonInJet(itJet, srcMu, dRtmp, ptmin, mu_pfmatch_index, lepId, dRmin);
       if(mu_pfmatch_index!=-1) {
         auto itLep = srcMu->ptrAt(mu_pfmatch_index);
 	lepPt =itLep->pt(); lepEta = itLep->eta(); lepPhi = itLep->phi(); lepId = 13;
+        if(!itLep->isPFMuon()){
+	  std::cout << " is not pFMuon " << std::endl;
+	  mu_pfmatch_index = -1;
+	}
       }
 
       std::vector<fastjet::PseudoJet> psub_3;
@@ -170,6 +185,32 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
       veleIdx3SJ->push_back( ele_pfmatch_index );
       vmuIdx3SJ->push_back( mu_pfmatch_index );
       vidLep->push_back( lepId );
+
+      // Try removing matched lepton (if any) from PF constituents
+      if ( mu_pfmatch_index != -1 or ele_pfmatch_index != -1 ) {
+	bool found = false;
+        for ( const auto& pfPart : itJet.daughterPtrVector() ) {
+          if ( reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) < 0.01 and std::abs(pfPart->pdgId()) == lepId )
+	    {
+	      found = true;
+	      continue;
+	    }
+          pfCandsNoLep->push_back(edm::Ptr<pat::PackedCandidate>(pfPart));
+        }
+	if ( found == false ) {
+	  std::cout << "failed to find particle associated to mu" << mu_pfmatch_index << "/ele" << ele_pfmatch_index << " at " << lepEta << ", " << lepPhi << ", " << lepId << std::endl;
+	  bool lepfound = false;
+	  for ( const auto& pfPart : itJet.daughterPtrVector() ) {
+	    if ( (std::abs(pfPart->pdgId()) == 11) or (std::abs(pfPart->pdgId()) == 13) ) {
+	      lepfound = true;
+	      std::cout << "    " << pfPart->eta() << ", " << pfPart->phi() << ", " << pfPart->pdgId() << " dR=" << reco::deltaR(pfPart->eta(), pfPart->phi(), lepEta, lepPhi) << std::endl;
+	    }
+	  }
+	  if ( lepfound == false ) { 
+	    std::cout << " no lepton in candidates " << std::endl;
+	  }
+	}
+      }
     }
 
 
@@ -203,6 +244,8 @@ LeptonInJetProducer<T>::produce(edm::StreamID streamID, edm::Event& iEvent, cons
     filleridLep.insert(srcJet,vidLep->begin(),vidLep->end());
     filleridLep.fill();
     iEvent.put(std::move(idLepV),"idLep");
+
+    iEvent.put(std::move(pfCandsNoLep), "pfCandsNoLep");
 }
 
 template <typename T>

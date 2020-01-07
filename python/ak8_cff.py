@@ -89,14 +89,48 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 
     process.lepInJetVars = cms.EDProducer("LepInJetProducer",
                                           src = srcJets,
-                                          srcEle = cms.InputTag("slimmedElectrons"),
-                                          srcMu = cms.InputTag("slimmedMuons")
+                                          srcEle = cms.InputTag("finalElectrons"),
+                                          srcMu = cms.InputTag("finalMuons")
                                           )
+
+    jetToolbox(process, 'ak8', 'leptonSubtractedJetSeq', '', associateTask=False,
+               newPFCollection=True, nameNewPFCollection='lepInJetVars:pfCandsNoLep',	
+               PUMethod='Puppi', JETCorrPayload='AK8PFPuppi', JETCorrLevels=JETCorrLevels,
+               Cut='pt > 170.0 && abs(rapidity()) < 2.4',
+               miniAOD=True, runOnMC=runOnMC,
+               addNsub=True, maxTau=4, addEnergyCorrFunc=True,
+	       GetSubjetMCFlavour=False,GetJetMCFlavour=False,
+               addSoftDrop=True, addSoftDropSubjets=True, subJETCorrPayload='AK4PFPuppi', subJETCorrLevels=JETCorrLevels,
+               bTagDiscriminators=bTagDiscriminators, subjetBTagDiscriminators=subjetBTagDiscriminators,
+               postFix='LeptonSubtracted',
+               )
+
+    leptonSubtractedToEmbed = {
+        'tau1': 'userFloat("NjettinessAK8PuppiLeptonSubtracted:tau1")',
+        'tau2': 'userFloat("NjettinessAK8PuppiLeptonSubtracted:tau2")',
+        'tau3': 'userFloat("NjettinessAK8PuppiLeptonSubtracted:tau3")',
+        'tau4': 'userFloat("NjettinessAK8PuppiLeptonSubtracted:tau4")',
+        'n2b1': 'userFloat("ak8PFJetsPuppiLeptonSubtractedSoftDropValueMap:nb1AK8PuppiLeptonSubtractedSoftDropN2")',
+        'n3b1': 'userFloat("ak8PFJetsPuppiLeptonSubtractedSoftDropValueMap:nb1AK8PuppiLeptonSubtractedSoftDropN3")',
+        'msoftdrop': 'groomedMass()',
+        'msoftdropraw': 'userFloat("ak8PFJetsPuppiLeptonSubtractedSoftDropMass")',
+        'subJet1btagDeepB': '?nSubjetCollections()>0 && subjets().size()>0?subjets()[0].get().bDiscriminator("pfDeepCSVJetTags:probb")+subjets()[0].get().bDiscriminator("pfDeepCSVJetTags:probbb"):-2',
+        'subJet2btagDeepB': '?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].get().bDiscriminator("pfDeepCSVJetTags:probb")+subjets()[1].get().bDiscriminator("pfDeepCSVJetTags:probbb"):-2',
+        'pt': 'pt()',
+    }
+    process.matchLeptonSubtracted = cms.EDProducer("PatJetDeltaRValueMapProducer",
+                                                   src=srcJets,
+                                                   matched=cms.InputTag('packedPatJetsAK8PFPuppiLeptonSubtractedSoftDrop'),
+                                                   distMax=cms.double(0.8),
+                                                   values=cms.vstring(list(leptonSubtractedToEmbed.values())),
+                                                   valueLabels=cms.vstring(list(leptonSubtractedToEmbed.keys())),
+                                                   )
 
     process.customAK8WithUserData = cms.EDProducer("PATJetUserDataEmbedder",
                                                    src=srcJets,
                                                    userFloats = cms.PSet(lsf3 = cms.InputTag("lepInJetVars:lsf3"),
                                                                          dRLep = cms.InputTag("lepInJetVars:dRLep"),
+                                                                         **{('leptonSubtracted:' + k): cms.InputTag("matchLeptonSubtracted:"+k) for k in leptonSubtractedToEmbed.keys()}
                                                                          ),
                                                    userInts = cms.PSet(tightId = cms.InputTag("tightJetIdCustomAK8"),
                                                                        tightIdLepVeto = cms.InputTag("tightJetIdLepVetoCustomAK8"),
@@ -112,7 +146,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 
     process.customAK8Table = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("customAK8WithUserData"),
-        name=cms.string("CustomAK8Puppi"),
+        name=cms.string("FatJet"),
         cut=cms.string(""),
         doc=cms.string("customized ak8 puppi jets for HRT"),
         singleton=cms.bool(False),  # the number of entries is variable
@@ -128,7 +162,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             n2b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN2')", float, doc="N2 with beta=1", precision=10),
             n3b1=Var("userFloat('ak8PFJetsPuppiSoftDropValueMap:nb1AK8PuppiSoftDropN3')", float, doc="N3 with beta=1", precision=10),
             msoftdrop=Var("groomedMass()", float, doc="Corrected soft drop mass with PUPPI", precision=10),
-            msoftdrop_raw=Var("userFloat('ak8PFJetsPuppiSoftDropMass')", float, doc="Raw soft drop mass with PUPPI", precision=10),
+            rawmsoftdrop=Var("userFloat('ak8PFJetsPuppiSoftDropMass')", float, doc="Raw soft drop mass with PUPPI", precision=10),
             #btagDeepB = Var("bDiscriminator('pfDeepCSVJetTags:probb')+bDiscriminator('pfDeepCSVJetTags:probbb')",float,doc="DeepCSV b+bb tag discriminator",precision=10),
             #btagCSVV2=Var("bDiscriminator('pfCombinedInclusiveSecondaryVertexV2BJetTags')", float, doc=" pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)", precision=10),
             btagHbb=Var("bDiscriminator('pfBoostedDoubleSecondaryVertexAK8BJetTags')", float, doc="old Higgs to BB tagger discriminator", precision=10),
@@ -147,6 +181,17 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             muonIdx3SJ = Var("userInt('muonIdx3SJ')",int, doc="index of muon matched (3 subjets)"),
             electronIdx3SJ = Var("userInt('electronIdx3SJ')",int,doc="index of electron matched (3 subjets)"),
             idLep =  Var("userInt('idLep')", int, doc="id of pf particle matched to that reco electron or muon"),
+            LStau1 = Var("userFloat('leptonSubtracted:tau1')", float, doc="Nsubjettiness, after subtracting highest pt lepton from jet", precision=10),
+            LStau2 = Var("userFloat('leptonSubtracted:tau2')", float, doc="Nsubjettiness, after subtracting highest pt lepton from jet", precision=10),
+            LStau3 = Var("userFloat('leptonSubtracted:tau3')", float, doc="Nsubjettiness, after subtracting highest pt lepton from jet", precision=10),
+            LStau4 = Var("userFloat('leptonSubtracted:tau4')", float, doc="Nsubjettiness, after subtracting highest pt lepton from jet", precision=10),
+            LSn2b1 = Var("userFloat('leptonSubtracted:n2b1')", float, doc="N2 with beta=1, after subtracting highest pt lepton from jet", precision=10),
+            LSn3b1 = Var("userFloat('leptonSubtracted:n3b1')", float, doc="N3 with beta=1, after subtracting highest pt lepton from jet", precision=10),
+            LSmsoftdrop = Var("userFloat('leptonSubtracted:msoftdrop')", float, doc="Softdrop mass with PUPPI, after subtracting highest pt lepton from jet", precision=10),
+            LSrawmsoftdrop = Var("userFloat('leptonSubtracted:msoftdropraw')", float, doc="Softdrop mass with PUPPI, after subtracting highest pt lepton from jet", precision=10),
+            LSsubJet1btagDeepB = Var("userFloat('leptonSubtracted:subJet1btagDeepB')", float, doc="Subjet DeepCSV b-tag score (b+bb), after subtracting highest pt lepton from jet", precision=10),
+            LSsubJet2btagDeepB = Var("userFloat('leptonSubtracted:subJet2btagDeepB')", float, doc="Subjet DeepCSV b-tag score (b+bb), after subtracting highest pt lepton from jet", precision=10),
+            LSpt = Var("userFloat('leptonSubtracted:pt')", float, doc="Jet pt after sub", precision=10),
         )
     )
 
@@ -172,7 +217,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8SubJetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
         src=cms.InputTag("selectedPatJetsAK8PFPuppiSoftDropPacked", "SubJets"),
         cut=cms.string(""),
-        name=cms.string("CustomAK8PuppiSubJet"),
+        name=cms.string("SubJet"),
         doc=cms.string("customized ak8 puppi subjets for HRT"),
         singleton=cms.bool(False),  # the number of entries is variable
         extension=cms.bool(False),  # this is the main table for the jets
@@ -196,7 +241,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
                                                         src = cms.InputTag("customAK8Constituents", "constituents"),
                                                         cut = cms.string(""), #we should not filter after pruning
-                                                        name= cms.string("PFCandsAK8"),
+                                                        name= cms.string("FatJetPFCands"),
                                                         doc = cms.string("interesting particles from AK8 jets"),
                                                         singleton = cms.bool(False), # the number of entries is variable
                                                         extension = cms.bool(False), # this is the main table for the AK8 constituents
@@ -215,6 +260,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
         process.lepInJetVars,
+        process.matchLeptonSubtracted,
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable,
