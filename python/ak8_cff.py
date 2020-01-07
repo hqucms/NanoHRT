@@ -89,8 +89,8 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
 
     process.lepInJetVars = cms.EDProducer("LepInJetProducer",
                                           src = srcJets,
-                                          srcEle = cms.InputTag("slimmedElectrons"),
-                                          srcMu = cms.InputTag("slimmedMuons")
+                                          srcEle = cms.InputTag("finalElectrons"),
+                                          srcMu = cms.InputTag("finalMuons")
                                           )
 
     jetToolbox(process, 'ak8', 'leptonSubtractedJetSeq', '', associateTask=False,
@@ -116,6 +116,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         'msoftdropraw': 'userFloat("ak8PFJetsPuppiLeptonSubtractedSoftDropMass")',
         'subJet1btagDeepB': '?nSubjetCollections()>0 && subjets().size()>0?subjets()[0].get().bDiscriminator("pfDeepCSVJetTags:probb")+subjets()[0].get().bDiscriminator("pfDeepCSVJetTags:probbb"):-2',
         'subJet2btagDeepB': '?nSubjetCollections()>0 && subjets().size()>1?subjets()[1].get().bDiscriminator("pfDeepCSVJetTags:probb")+subjets()[1].get().bDiscriminator("pfDeepCSVJetTags:probbb"):-2',
+        'pt': 'pt()',
     }
     process.matchLeptonSubtracted = cms.EDProducer("PatJetDeltaRValueMapProducer",
                                                    src=srcJets,
@@ -190,6 +191,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
             LSrawmsoftdrop = Var("userFloat('leptonSubtracted:msoftdropraw')", float, doc="Softdrop mass with PUPPI, after subtracting highest pt lepton from jet", precision=10),
             LSsubJet1btagDeepB = Var("userFloat('leptonSubtracted:subJet1btagDeepB')", float, doc="Subjet DeepCSV b-tag score (b+bb), after subtracting highest pt lepton from jet", precision=10),
             LSsubJet2btagDeepB = Var("userFloat('leptonSubtracted:subJet2btagDeepB')", float, doc="Subjet DeepCSV b-tag score (b+bb), after subtracting highest pt lepton from jet", precision=10),
+            LSpt = Var("userFloat('leptonSubtracted:pt')", float, doc="Jet pt after sub", precision=10),
         )
     )
 
@@ -239,7 +241,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
                                                         src = cms.InputTag("customAK8Constituents", "constituents"),
                                                         cut = cms.string(""), #we should not filter after pruning
-                                                        name= cms.string("PFCandsAK8"),
+                                                        name= cms.string("FatJetPFCands"),
                                                         doc = cms.string("interesting particles from AK8 jets"),
                                                         singleton = cms.bool(False), # the number of entries is variable
                                                         extension = cms.bool(False), # this is the main table for the AK8 constituents
