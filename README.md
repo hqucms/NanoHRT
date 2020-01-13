@@ -3,8 +3,8 @@
 ### Set up CMSSW
 
 ```bash
-cmsrel CMSSW_10_2_15
-cd CMSSW_10_2_15/src
+cmsrel CMSSW_11_0_0
+cd CMSSW_11_0_0/src
 cmsenv
 git-cms-addpkg PhysicsTools/NanoAOD 
 git-cms-addpkg PhysicsTools/SelectorUtils 
@@ -13,7 +13,7 @@ git-cms-addpkg PhysicsTools/SelectorUtils
 ### Get customized NanoAOD producer
 
 ```bash
-git clone https://github.com/DAZSLE/NanoHRT.git PhysicsTools/NanoHRT
+git clone https://github.com/DAZSLE/Pancakes.git PhysicsTools/Pancakes
 ```
 
 ### Compile
@@ -25,8 +25,8 @@ scram b -j 16
 ### Test
 
 ```bash
-mkdir PhysicsTools/NanoHRT/test
-cd PhysicsTools/NanoHRT/test
+mkdir PhysicsTools/Pancakes/test
+cd PhysicsTools/Pancakes/test
 ```
 
 MC:
