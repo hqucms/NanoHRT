@@ -232,30 +232,6 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     )
     process.customAK8SubJetTable.variables.pt.precision = 10
 
-    process.customAK8Constituents = cms.EDProducer("PatJetConstituentPtrSelector",
-                                                   #src = cms.InputTag("updatedJetsAK8"),
-                                                   src = cms.InputTag("customAK8WithUserData"),
-                                                   cut = cms.string("")
-                                                   )
-
-    process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
-                                                        src = cms.InputTag("customAK8Constituents", "constituents"),
-                                                        cut = cms.string(""), #we should not filter after pruning
-                                                        name= cms.string("FatJetPFCands"),
-                                                        doc = cms.string("interesting particles from AK8 jets"),
-                                                        singleton = cms.bool(False), # the number of entries is variable
-                                                        extension = cms.bool(False), # this is the main table for the AK8 constituents
-                                                        variables = cms.PSet(CandVars,
-                                                                             puppiWeight = Var("puppiWeight()", float, doc="Puppi weight",precision=10),
-                                                                             puppiWeightNoLep = Var("puppiWeightNoLep()", float, doc="Puppi weight removing leptons",precision=10),
-                                                                             vtxChi2 = Var("?hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2",precision=10),
-                                                                             trkChi2 = Var("?hasTrackDetails()?pseudoTrack().normalizedChi2():-1", float, doc="normalized trk chi2", precision=10),
-                                                                             dz = Var("?hasTrackDetails()?dz():-1", float, doc="pf dz",precision=10),
-                                                                             d0 = Var("?hasTrackDetails()?dxy():-1", float, doc="pf d0",precision=10),
-                                                                             d0Err = Var("?hasTrackDetails()?dxyError():-1", float, doc="pf d0 err",precision=10),
-                                                                             )
-                                                        )
-
     process.customizedAK8Task = cms.Task(
         process.tightJetIdCustomAK8,
         process.tightJetIdLepVetoCustomAK8,
@@ -264,8 +240,6 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.customAK8WithUserData,
         process.customAK8Table,
         process.customAK8SubJetTable,
-        process.customAK8Constituents,
-        process.customAK8ConstituentsTable,
         )
 
     if runOnMC:
@@ -331,3 +305,36 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
         process.schedule.associate(process.customizedAK8Task)
     else:
         getattr(process, path).associate(process.customizedAK8Task)
+
+
+def addCustomizedAK8PF(process):
+    if not hasattr(process, 'customizedAK8Task'):
+        raise RuntimeError("Call setupCustomizedAK8 first")
+
+    process.customAK8Constituents = cms.EDProducer("PatJetConstituentPtrSelector",
+                                                   #src = cms.InputTag("updatedJetsAK8"),
+                                                   src = cms.InputTag("customAK8WithUserData"),
+                                                   cut = cms.string("")
+                                                   )
+
+    process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
+                                                        src = cms.InputTag("customAK8Constituents", "constituents"),
+                                                        cut = cms.string(""), #we should not filter after pruning
+                                                        name= cms.string("FatJetPFCands"),
+                                                        doc = cms.string("interesting particles from AK8 jets"),
+                                                        singleton = cms.bool(False), # the number of entries is variable
+                                                        extension = cms.bool(False), # this is the main table for the AK8 constituents
+                                                        variables = cms.PSet(CandVars,
+                                                                             puppiWeight = Var("puppiWeight()", float, doc="Puppi weight",precision=10),
+                                                                             puppiWeightNoLep = Var("puppiWeightNoLep()", float, doc="Puppi weight removing leptons",precision=10),
+                                                                             vtxChi2 = Var("?hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2",precision=10),
+                                                                             trkChi2 = Var("?hasTrackDetails()?pseudoTrack().normalizedChi2():-1", float, doc="normalized trk chi2", precision=10),
+                                                                             dz = Var("?hasTrackDetails()?dz():-1", float, doc="pf dz",precision=10),
+                                                                             d0 = Var("?hasTrackDetails()?dxy():-1", float, doc="pf d0",precision=10),
+                                                                             d0Err = Var("?hasTrackDetails()?dxyError():-1", float, doc="pf d0 err",precision=10),
+                                                                             )
+                                                        )
+
+    process.customizedAK8Task.add(process.customAK8Constituents)
+    process.customizedAK8Task.add(process.customAK8ConstituentsTable)
+    return process
