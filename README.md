@@ -3,11 +3,12 @@
 ### Set up CMSSW
 
 ```bash
+setenv SCRAM_ARCH slc7_amd64_gcc700
 cmsrel CMSSW_10_6_5
 cd CMSSW_10_6_5/src
 cmsenv
-git-cms-addpkg PhysicsTools/NanoAOD 
-git-cms-addpkg PhysicsTools/SelectorUtils 
+git cms-addpkg PhysicsTools/NanoAOD 
+git cms-addpkg PhysicsTools/SelectorUtils 
 ```
 
 ### Get customized NanoAOD producer
@@ -63,7 +64,7 @@ source /cvmfs/cms.cern.ch/crab3/crab.sh
 **Step 1**: generate the python config file with `cmsDriver.py`.
 **Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test)
 
-These command will perform a "dryrun" to print out the CRAB configuration files. Please check everything is correct (e.g., the output path, version number, requested number of cores, etc.) before submitting the actual jobs. To actually submit the jobs to CRAB, just remove the `--dryrun` option at the end.
+These commands are condensed in e.g. `submit_data_UL.sh` or `submit_mc_UL.sh`. They will perform a "dryrun" to print out the CRAB configuration files. Please check everything is correct (e.g., the output path, version number, requested number of cores, etc.) before submitting the actual jobs. To actually submit the jobs to CRAB, just remove the `--dryrun` option at the end.
 
 To check status
 `https://monit-grafana.cern.ch/d/cmsTMDetail/cms-task-monitoring-task-view`
