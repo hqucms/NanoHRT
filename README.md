@@ -3,8 +3,8 @@
 ### Set up CMSSW
 
 ```bash
-cmsrel CMSSW_11_0_0
-cd CMSSW_11_0_0/src
+cmsrel CMSSW_10_6_5
+cd CMSSW_10_6_5/src
 cmsenv
 git-cms-addpkg PhysicsTools/NanoAOD 
 git-cms-addpkg PhysicsTools/SelectorUtils 
@@ -60,36 +60,8 @@ voms-proxy-init -rfc -voms cms --valid 168:00
 source /cvmfs/cms.cern.ch/crab3/crab.sh
 ```
 
-**Step 1**: generate the python config file with `cmsDriver.py` with the following commands - these are included for now:
-
-MC (102X, MiniAODv2):
-
-```bash
-cmsDriver.py mc -n -1 --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py --no_exec
-```
-
-Data (`2018` PromptReco-17Jul2018):
-
-```bash
-cmsDriver.py data -n -1 --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --filein file:miniAOD.root --fileout file:RunIIAutumn18NanoAODv5.root --python_filename RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py --no_exec
-```
-
-**Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test), e.g.: 
-
-version = 01
-
-For MC (2018):
-`python crab.py -p RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py -o /store/group/[group]/[username]/pancakes/[version]/ -t pancakes-[version] -i signal_2018.txt --num-cores 2 --send-external -s EventAwareLumiBased -n 50000 --work-area crab_projects_mc_2018 --max-memory 5000 --dryrun`
-
-For data (2018):
-
-`python crab.py -p RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py  -o /store/group/[group]/[username]/pancakes/[version] -t pancakes-[version] -i data_2018.txt --num-cores 2 --send-external -s EventAwareLumiBased -n 200000 --work-area crab_projects_data_2018 --max-memory 5000 --json https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions18/13TeV/ReReco/Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.txt --dryrun`
-
-A JSON file can be applied for data samples with the `-j` options. By default, we use the golden JSON for 2016:
-
-```
-https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt
-```
+**Step 1**: generate the python config file with `cmsDriver.py`.
+**Step 2**: use the `crab.py` script to submit the CRAB jobs (use --dry-run to test)
 
 These command will perform a "dryrun" to print out the CRAB configuration files. Please check everything is correct (e.g., the output path, version number, requested number of cores, etc.) before submitting the actual jobs. To actually submit the jobs to CRAB, just remove the `--dryrun` option at the end.
 

@@ -23,7 +23,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
     ]
     JETCorrLevels = ['L2Relative', 'L3Absolute', 'L2L3Residual']
 
-    from PhysicsTools.NanoHRT.jetToolbox_cff import jetToolbox
+    from PhysicsTools.Pancakes.jetToolbox_cff import jetToolbox
     jetToolbox(process, 'ak8', 'dummySeq', 'out', associateTask=False,
                PUMethod='Puppi', JETCorrPayload='AK8PFPuppi', JETCorrLevels=JETCorrLevels,
                Cut='pt > 170.0 && abs(rapidity()) < 2.4',
@@ -93,7 +93,7 @@ def setupCustomizedAK8(process, runOnMC=False, path=None):
                                           srcMu = cms.InputTag("finalMuons")
                                           )
 
-    jetToolbox(process, 'ak8', 'leptonSubtractedJetSeq', '', associateTask=False,
+    jetToolbox(process, 'ak8', 'leptonSubtractedJetSeq', 'out', associateTask=False,
                newPFCollection=True, nameNewPFCollection='lepInJetVars:pfCandsNoLep',	
                PUMethod='Puppi', JETCorrPayload='AK8PFPuppi', JETCorrLevels=JETCorrLevels,
                Cut='pt > 170.0 && abs(rapidity()) < 2.4',

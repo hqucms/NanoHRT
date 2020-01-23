@@ -253,7 +253,7 @@ def main():
                         help='Max units per job. The meaning depends on the splitting. Default: %(default)d'
                         )
     parser.add_argument('-t', '--tag',
-                        default='NanoHRT',
+                        default='pancakes-02',
                         help='Output dataset tag. Default: %(default)s'
                         )
     parser.add_argument('-j', '--json',

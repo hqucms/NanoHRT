@@ -1,5 +1,5 @@
 import FWCore.ParameterSet.Config as cms
-from PhysicsTools.NanoHRT.ak8_cff import setupCustomizedAK8
+from PhysicsTools.Pancakes.ak8_cff import setupCustomizedAK8
 from PhysicsTools.NanoAOD.common_cff import Var
 
 def nanoHRT_customizeCommon(process, runOnMC):
