@@ -36,7 +36,7 @@ MC:
 
 ex. file: /store/mc/RunIIAutumn18MiniAOD/BulkGravTohhTohWWhbb_narrow_M-2300_TuneCP2_13TeV-madgraph_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/260000/24516D8A-B053-1A42-A10F-07EA8D96FE6C.root
 ```bash
-cmsDriver.py test_nanoHRT_mc --filein /store/mc/RunIIAutumn18MiniAOD/BulkGravTohhTohWWhbb_narrow_M-2300_TuneCP2_13TeV-madgraph_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/260000/24516D8A-B053-1A42-A10F-07EA8D96FE6C.root --fileout file:RunIIAutumn18NanoAODv5_BulkGravTohhTohWWhbb.root --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --python_filename RunIIAutumn18NanoAODv5_pancakes01_mc_cfg.py --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeMC -n 10 --no_exec 
+cmsDriver.py test_pancakes_mc --filein /store/mc/RunIIAutumn18MiniAOD/BulkGravTohhTohWWhbb_narrow_M-2300_TuneCP2_13TeV-madgraph_pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/260000/24516D8A-B053-1A42-A10F-07EA8D96FE6C.root --fileout file:RunIIAutumn18NanoAODv5_BulkGravTohhTohWWhbb.root --mc --eventcontent NANOAODSIM --datatier NANOAODSIM --conditions 102X_upgrade2018_realistic_v19 --step NANO --nThreads 2 --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/Pancakes/nanoHRT_cff.nanoHRT_customizeMC -n 10 --no_exec 
 ```
 
 Data:
@@ -45,7 +45,7 @@ Data:
 
 ex. file: /store/data/Run2018B/JetHT/MINIAOD/17Sep2018-v1/60000/FE3C69F0-A0BC-8941-92AF-B0DA1A6270BF.root
 ```bash
-cmsDriver.py test_nanoHRT_data --filein /store/data/Run2018B/JetHT/MINIAOD/17Sep2018-v1/60000/FE3C69F0-A0BC-8941-92AF-B0DA1A6270BF.root --fileout file:RunIIAutumn18NanoAODv5_JetHTRun2018B.root --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --eventcontent NANOAOD --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/NanoHRT/nanoHRT_cff.nanoHRT_customizeData --python_filename=RunIIAutumn18NanoAODv5_pancakes01_data_cfg.py -s NANO --no_exec 
+cmsDriver.py test_pancakes_data --filein /store/data/Run2018B/JetHT/MINIAOD/17Sep2018-v1/60000/FE3C69F0-A0BC-8941-92AF-B0DA1A6270BF.root --fileout file:RunIIAutumn18NanoAODv5_JetHTRun2018B.root --data --eventcontent NANOAOD --datatier NANOAOD --conditions 102X_dataRun2_v11 --eventcontent NANOAOD --era Run2_2018,run2_nanoAOD_102Xv1 --customise PhysicsTools/Pancakes/nanoHRT_cff.nanoHRT_customizeData -s NANO --no_exec 
 ```
 
 ### Production
@@ -53,7 +53,7 @@ cmsDriver.py test_nanoHRT_data --filein /store/data/Run2018B/JetHT/MINIAOD/17Sep
 **Step 0**: switch to the crab production directory and set up grid proxy, CRAB environment, etc.
 
 ```bash
-mkdir $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
+mkdir -p $CMSSW_BASE/src/PhysicsTools/Pancakes/crab
 cd $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
 # set up grid proxy
 voms-proxy-init -rfc -voms cms --valid 168:00
