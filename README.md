@@ -54,7 +54,7 @@ cmsDriver.py test_pancakes_data --filein /store/data/Run2018B/JetHT/MINIAOD/17Se
 
 ```bash
 mkdir -p $CMSSW_BASE/src/PhysicsTools/Pancakes/crab
-cd $CMSSW_BASE/src/PhysicsTools/NanoHRT/crab
+cd $CMSSW_BASE/src/PhysicsTools/Pancakes/crab
 # set up grid proxy
 voms-proxy-init -rfc -voms cms --valid 168:00
 # set up CRAB env (must be done after cmsenv)
