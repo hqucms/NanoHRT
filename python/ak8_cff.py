@@ -311,30 +311,35 @@ def addCustomizedAK8PF(process):
     if not hasattr(process, 'customizedAK8Task'):
         raise RuntimeError("Call setupCustomizedAK8 first")
 
-    process.customAK8Constituents = cms.EDProducer("PatJetConstituentPtrSelector",
+    process.customAK8ConstituentsTable = cms.EDProducer("JetConstituentTableProducer",
                                                    #src = cms.InputTag("updatedJetsAK8"),
                                                    src = cms.InputTag("customAK8WithUserData"),
-                                                   cut = cms.string("")
+                                                   cut = cms.string("pt()>170"),
+                                                   name = cms.string("FatJetPFCands"),
                                                    )
 
-    process.customAK8ConstituentsTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
-                                                        src = cms.InputTag("customAK8Constituents", "constituents"),
+    process.customAK8ConstituentsExtTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
+                                                        src = cms.InputTag("customAK8ConstituentsTable"),
                                                         cut = cms.string(""), #we should not filter after pruning
-                                                        name= cms.string("FatJetPFCands"),
+                                                        name = cms.string("FatJetPFCands"),
                                                         doc = cms.string("interesting particles from AK8 jets"),
                                                         singleton = cms.bool(False), # the number of entries is variable
-                                                        extension = cms.bool(False), # this is the main table for the AK8 constituents
+                                                        extension = cms.bool(True), # this is the extension table for the AK8 constituents
                                                         variables = cms.PSet(CandVars,
                                                                              puppiWeight = Var("puppiWeight()", float, doc="Puppi weight",precision=10),
                                                                              puppiWeightNoLep = Var("puppiWeightNoLep()", float, doc="Puppi weight removing leptons",precision=10),
-                                                                             vtxChi2 = Var("?hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2",precision=10),
+                                                                             vtxChi2 = Var("?hasTrackDetails()?vertexChi2():-1", float, doc="vertex chi2", precision=10),
                                                                              trkChi2 = Var("?hasTrackDetails()?pseudoTrack().normalizedChi2():-1", float, doc="normalized trk chi2", precision=10),
-                                                                             dz = Var("?hasTrackDetails()?dz():-1", float, doc="pf dz",precision=10),
-                                                                             d0 = Var("?hasTrackDetails()?dxy():-1", float, doc="pf d0",precision=10),
-                                                                             d0Err = Var("?hasTrackDetails()?dxyError():-1", float, doc="pf d0 err",precision=10),
+                                                                             dz = Var("?hasTrackDetails()?dz():-1", float, doc="pf dz", precision=10),
+                                                                             dzErr = Var("?hasTrackDetails()?dzError():-1", float, doc="pf dz err", precision=10),
+                                                                             d0 = Var("?hasTrackDetails()?dxy():-1", float, doc="pf d0", precision=10),
+                                                                             d0Err = Var("?hasTrackDetails()?dxyError():-1", float, doc="pf d0 err", precision=10),
+                                                                             pvAssocQuality = Var("pvAssociationQuality()", int, doc="primary vertex association quality"),
+                                                                             lostInnerHits = Var("lostInnerHits()", int, doc="lost inner hits"),
+                                                                             trkQuality = Var("?hasTrackDetails()?pseudoTrack().qualityMask():0", int, doc="track quality mask"),
                                                                              )
                                                         )
 
-    process.customizedAK8Task.add(process.customAK8Constituents)
     process.customizedAK8Task.add(process.customAK8ConstituentsTable)
+    process.customizedAK8Task.add(process.customAK8ConstituentsExtTable)
     return process

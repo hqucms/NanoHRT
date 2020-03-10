@@ -1,9 +1,19 @@
 import FWCore.ParameterSet.Config as cms
-from PhysicsTools.Pancakes.ak8_cff import setupCustomizedAK8
+from PhysicsTools.Pancakes.ak8_cff import setupCustomizedAK8, addCustomizedAK8PF
 from PhysicsTools.NanoAOD.common_cff import Var
 
+
+def nanoHRT_customizeSV(process):
+    process.vertexTable.dlenMin = -1
+    process.vertexTable.dlenSigMin = -1
+    process.svCandidateTable.variables.ntracks = Var("numberOfDaughters()", int, doc="number of tracks")
+
+
 def nanoHRT_customizeCommon(process, runOnMC):
+    nanoHRT_customizeSV(process)
     setupCustomizedAK8(process, runOnMC=runOnMC)
+    addCustomizedAK8PF(process)
+
     # fix genParticles: keep first gen decay product for all top/W/Z/H
     process.finalGenParticles.select.append('keep+ (abs(pdgId) == 6 || abs(pdgId) == 23 || abs(pdgId) == 24 || abs(pdgId) == 25)')
     # update MET w/ JEC
