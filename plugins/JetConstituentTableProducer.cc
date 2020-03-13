@@ -95,14 +95,23 @@ void JetConstituentTableProducer::produce(edm::Event &iEvent, const edm::EventSe
       for (const auto &cand : daughters) {
         outCands->push_back(cand);
         jetIdx.push_back(i_jet);
-        btagbtvdeep::TrackInfoBuilder trkinfo(track_builder_);
-        trkinfo.buildTrackInfo(&(*cand), jet_dir, jet_ref_track_dir, vtxs_->at(0));
-        btagEtaRel.push_back(trkinfo.getTrackEtaRel());
-        btagPtRatio.push_back(trkinfo.getTrackPtRatio());
-        btagPParRatio.push_back(trkinfo.getTrackPParRatio());
-        btagSip3dVal.push_back(trkinfo.getTrackSip3dVal());
-        btagSip3dSig.push_back(trkinfo.getTrackSip3dSig());
-        btagJetDistVal.push_back(trkinfo.getTrackJetDistVal());
+        if (cand->hasTrackDetails()){
+          btagbtvdeep::TrackInfoBuilder trkinfo(track_builder_);
+          trkinfo.buildTrackInfo(&(*cand), jet_dir, jet_ref_track_dir, vtxs_->at(0));
+          btagEtaRel.push_back(trkinfo.getTrackEtaRel());
+          btagPtRatio.push_back(trkinfo.getTrackPtRatio());
+          btagPParRatio.push_back(trkinfo.getTrackPParRatio());
+          btagSip3dVal.push_back(trkinfo.getTrackSip3dVal());
+          btagSip3dSig.push_back(trkinfo.getTrackSip3dSig());
+          btagJetDistVal.push_back(trkinfo.getTrackJetDistVal());
+        } else {
+          btagEtaRel.push_back(0);
+          btagPtRatio.push_back(0);
+          btagPParRatio.push_back(0);
+          btagSip3dVal.push_back(0);
+          btagSip3dSig.push_back(0);
+          btagJetDistVal.push_back(0);
+        }
       }
     }  // end jet loop
   }
